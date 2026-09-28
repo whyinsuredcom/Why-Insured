@@ -68,7 +68,7 @@ const getVideoEmbedUrl = (url) => {
 
   // Server uploads
   if (url.startsWith('/uploads/')) {
-    const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
+    const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/+$/, '');
     return { type: 'mp4', url: `${apiBase}${url}` };
   }
 

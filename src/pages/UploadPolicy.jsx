@@ -19,11 +19,7 @@ import {
 } from 'react-icons/fi';
 import jsPDF from 'jspdf';
 
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? 'http://localhost:5000' : 'https://why-insured-backend.vercel.app')
-).replace(/\/+$/, '');
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000").replace(/\/+$/, '');
 
 /**
  * UploadPolicy Page Component with Official-Source Verification System

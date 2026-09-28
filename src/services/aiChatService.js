@@ -17,11 +17,7 @@ import bajajLogo from '../assets/Bajaj.png';
 import sbiLogo from '../assets/SBI.png';
 import ackoLogo from '../assets/acko.png';
 
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? 'http://localhost:5000' : 'https://why-insured-backend.vercel.app')
-).replace(/\/+$/, '');
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000").replace(/\/+$/, '');
 
 // Logo Dictionary by Company ID
 const LOGO_MAP = {

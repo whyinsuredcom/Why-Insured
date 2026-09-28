@@ -649,9 +649,11 @@ export default function AdminOptimaSecurePlus() {
     if (url === 'asset:2x_coverage') return { type: 'mp4', url: secureBenefitVideo };
     if (url === 'asset:preventive') return { type: 'mp4', url: preventiveVideo };
 
-    if (url.startsWith('/uploads/')) {
-      const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
-      return { type: 'mp4', url: `${apiBase}${url}` };
+    const uploadMatch = url.match(/(?:\/uploads\/.*)$/);
+    if (url.startsWith('/uploads/') || uploadMatch) {
+      const apiBase = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000").replace(/\/+$/, '');
+      const uploadPath = uploadMatch ? uploadMatch[0] : url;
+      return { type: 'mp4', url: `${apiBase}${uploadPath}` };
     }
 
     if (url.includes('youtube.com/embed/')) return { type: 'youtube', url };
