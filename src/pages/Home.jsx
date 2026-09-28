@@ -361,6 +361,8 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-2.5 w-full">
             <a
               href="https://panel-hospital.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-full shadow-sm hover:shadow-md hover:border-slate-300 text-slate-700 hover:text-emerald-600 text-xs font-bold transition-all duration-200 cursor-pointer w-full"
             >
               <FiActivity className="text-[#059669] text-sm shrink-0" />
