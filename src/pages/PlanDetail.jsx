@@ -19,30 +19,87 @@ import BajajPlanDetailSection from '../components/BajajPlanDetailSection';
 import SbiPlanDetailSection from '../components/SbiPlanDetailSection';
 import AckoPlanDetailSection from '../components/AckoPlanDetailSection';
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/+$/, '');
+
 export default function PlanDetail() {
   const { companyId, planId } = useParams();
+  const [dynamicPlan, setDynamicPlan] = React.useState(null);
 
-  const company = companiesData.find(
+  // Fetch dynamic plan from backend API
+  React.useEffect(() => {
+    let isMounted = true;
+    async function loadDynamicPlan() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/public/plans/${companyId}/${planId}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (isMounted && json.success && json.data) {
+          setDynamicPlan(json.data);
+        }
+      } catch (e) {
+        // Graceful fallback to static dictionary
+      }
+    }
+    loadDynamicPlan();
+    return () => {
+      isMounted = false;
+    };
+  }, [companyId, planId]);
+
+  // Static company fallback
+  const staticCompany = companiesData.find(
     c => c.slug === companyId || c.id === companyId || (companyId === 'hdfc-life' && (c.id === 'hdfc-ergo' || c.slug === 'hdfc-ergo'))
   );
 
+  // Company resolution (dynamic from API or static fallback)
+  const company = staticCompany || (dynamicPlan?.company ? {
+    id: dynamicPlan.company.id || dynamicPlan.company.slug || companyId,
+    slug: dynamicPlan.company.slug || companyId,
+    name: dynamicPlan.company.name || dynamicPlan.companyName || companyId,
+    fullName: dynamicPlan.company.full_name || dynamicPlan.company.name || companyId,
+    logo: dynamicPlan.company.logo || dynamicPlan.companyLogo || '',
+    description: dynamicPlan.company.description || '',
+    theme: {
+      primary: dynamicPlan.company.primary_color || '#0038A8',
+      secondary: dynamicPlan.company.secondary_color || '#F0F4FF',
+      accent: dynamicPlan.company.primary_color || '#0038A8',
+      background: dynamicPlan.company.secondary_color || '#F0F4FF',
+      text: '#0F172A'
+    },
+    plans: []
+  } : null);
+
   const isHdfcErgo = company?.id === 'hdfc-ergo' || company?.id === 'hdfc-life';
 
-  const plan = isHdfcErgo
+  // Static plan fallback
+  const staticPlan = isHdfcErgo
     ? findHdfcPlan(company, planId)
-    : company?.plans.find(p => p.id === planId) ||
-    (company?.id === 'tata-aig' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'icici-lombard' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'niva-bupa' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'star-health' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'care-health' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'reliance-general' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'magma-hdi' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'manipal-cigna' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'aditya-birla' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'bajaj-general' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'sbi-general' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null) ||
-    (company?.id === 'acko' ? (company?.plans.find(p => p.id === planId) || company?.plans[0]) : null);
+    : company?.plans?.find(p => p.id === planId) ||
+    (company?.id === 'tata-aig' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'icici-lombard' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'niva-bupa' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'star-health' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'care-health' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'reliance-general' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'magma-hdi' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'manipal-cigna' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'aditya-birla' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'bajaj-general' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'sbi-general' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
+    (company?.id === 'acko' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null);
+
+  // Active plan merging dynamic CMS data
+  const plan = dynamicPlan ? {
+    ...staticPlan,
+    ...dynamicPlan,
+    name: dynamicPlan.name || staticPlan?.name,
+    description: dynamicPlan.description || dynamicPlan.tagline || staticPlan?.description,
+    coverage: dynamicPlan.coverage || staticPlan?.coverage,
+    details: {
+      ...staticPlan?.details,
+      ...dynamicPlan.details
+    }
+  } : staticPlan;
 
   const hdfcCanonicalPlanId = isHdfcErgo ? resolveHdfcPlanId(planId) : null;
 
@@ -62,7 +119,23 @@ export default function PlanDetail() {
 
   const isSpecialCompanyWithOwnComponent = company.id === 'hdfc-life' || company.id === 'hdfc-ergo' || company.id === 'tata-aig' || company.id === 'icici-lombard' || company.id === 'niva-bupa' || company.id === 'star-health' || company.id === 'care-health' || company.id === 'reliance-general' || company.id === 'magma-hdi' || company.id === 'manipal-cigna' || company.id === 'aditya-birla' || company.id === 'bajaj-general' || company.id === 'sbi-general' || company.id === 'acko';
   
-  const rawDetailSections = isSpecialCompanyWithOwnComponent ? [] : getPlanDetailData(plan, company);
+  // Detail sections: If dynamic CMS features are provided and not special company, map them cleanly
+  let rawDetailSections = [];
+  if (!isSpecialCompanyWithOwnComponent) {
+    if (dynamicPlan?.featuresSections && dynamicPlan.featuresSections.length > 0) {
+      rawDetailSections = dynamicPlan.featuresSections.map(sec => ({
+        title: sec.title || 'Policy Benefits',
+        isGrouped: false,
+        features: (sec.items || []).map(item => ({
+          title: item.title,
+          value: item.points && item.points.length > 0 ? item.points : (item.summary || item.subtitle || 'Covered')
+        }))
+      }));
+    } else {
+      rawDetailSections = getPlanDetailData(plan, company);
+    }
+  }
+
   const detailSections = company.id === 'tata-aig'
     ? rawDetailSections.filter(section => section.title !== 'Ratio' && section.title !== 'Fundamentals')
     : rawDetailSections;

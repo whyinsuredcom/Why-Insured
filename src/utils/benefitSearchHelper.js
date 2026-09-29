@@ -1,4 +1,4 @@
-import { formatPolicyBenefitHeading } from './policyBenefitHeadingHelper';
+import { formatPolicyBenefitHeading } from './policyBenefitHeadingHelper.js';
 
 /**
  * Searches and prioritizes matching benefits to the TOP of each section,
@@ -47,13 +47,26 @@ export function getBenefitSearchResults(featuresSections = [], rawQuery = '') {
     const stepsText = Array.isArray(item.steps) ? item.steps.join(' ').toLowerCase() : '';
     const allText = `${title} ${badge} ${subtitle} ${summary} ${description} ${coverage} ${pointsText} ${detailsText} ${limitsText} ${tierText} ${tablesText.toLowerCase()} ${stepsText}`;
 
+    const is2xQuery = /^(2x|2\s*x)$/i.test(query);
+    if (is2xQuery) {
+      const has2x = /\b2\s*x\b/i.test(allText) || /\b2x\b/i.test(allText) || title.includes('2x') || title.includes('2X');
+      if (has2x) {
+        return (title.includes('2x') || title.includes('2X')) ? 1000 : 600;
+      }
+      return 0; // Strictly do not match unrelated "2"
+    }
+
     if (title === query) score += 1000;
     else if (title.startsWith(query)) score += 800;
     else if (title.includes(query)) score += 600;
     else if (badge.includes(query) || coverage.includes(query)) score += 500;
     else if (subtitle.includes(query) || summary.includes(query) || description.includes(query)) score += 400;
     else if (allText.includes(query)) score += 300;
-    else if (queryTokens.length > 1 && queryTokens.every(token => allText.includes(token))) score += 250;
+    else if (queryTokens.length > 1 && queryTokens.every(token => {
+      if (token.length <= 1) return false;
+      const esc = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return new RegExp(`\\b${esc}\\b`, 'i').test(allText) || allText.includes(token);
+    })) score += 250;
     return score;
   };
 
@@ -121,6 +134,15 @@ export function getFilteredAndPrioritizedFeaturesSections(featuresSections = [],
 
     const allText = `${title} ${badge} ${subtitle} ${summary} ${description} ${coverage} ${pointsText} ${detailsText} ${limitsText} ${tierText} ${tablesText.toLowerCase()} ${stepsText}`;
 
+    const is2xQuery = /^(2x|2\s*x)$/i.test(query);
+    if (is2xQuery) {
+      const has2x = /\b2\s*x\b/i.test(allText) || /\b2x\b/i.test(allText) || title.includes('2x') || title.includes('2X');
+      if (has2x) {
+        return (title.includes('2x') || title.includes('2X')) ? 1000 : 600;
+      }
+      return 0; // Strictly do not match unrelated "2"
+    }
+
     // 1. Exact title match
     if (title === query) {
       score += 1000;
@@ -134,7 +156,11 @@ export function getFilteredAndPrioritizedFeaturesSections(featuresSections = [],
       score += 400;
     } else if (allText.includes(query)) {
       score += 300;
-    } else if (queryTokens.length > 1 && queryTokens.every(token => allText.includes(token))) {
+    } else if (queryTokens.length > 1 && queryTokens.every(token => {
+      if (token.length <= 1) return false;
+      const esc = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return new RegExp(`\\b${esc}\\b`, 'i').test(allText) || allText.includes(token);
+    })) {
       score += 250;
     }
 

@@ -3,6 +3,7 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowLeft, FiShare2, FiCheck, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { companiesData } from '../data/companies';
+import { fetchPublicCompanies, fetchPublicPlan } from '../services/publicApiService';
 import CompareForm from '../components/CompareForm';
 import { getComparisonSections, BENEFIT_CATEGORIES } from '../utils/compareDataHelper';
 import { exportComparisonToPDF } from '../utils/pdfExportHelper';
@@ -197,11 +198,77 @@ export default function ComparisonPage() {
 
   const chipScrollRef = useRef(null);
 
-  // Resolve companies and plans from data
-  const company1 = companiesData.find(c => c.id === c1 || c.slug === c1);
-  const company2 = companiesData.find(c => c.id === c2 || c.slug === c2);
-  const plan1 = company1?.plans.find(p => p.id === p1);
-  const plan2 = company2?.plans.find(p => p.id === p2);
+  const [liveCompanies, setLiveCompanies] = useState(companiesData);
+  const [dynamicPlan1Data, setDynamicPlan1Data] = useState(null);
+  const [dynamicPlan2Data, setDynamicPlan2Data] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchPublicCompanies().then((res) => {
+      if (mounted && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setLiveCompanies(res.data);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  // Resolve companies and plans from data (with live Supabase data + offline fallback)
+  const company1 = liveCompanies.find(c => c.id === c1 || c.slug === c1) || companiesData.find(c => c.id === c1 || c.slug === c1);
+  const company2 = liveCompanies.find(c => c.id === c2 || c.slug === c2) || companiesData.find(c => c.id === c2 || c.slug === c2);
+  const basePlan1 = company1?.plans?.find(p => p.id === p1 || p.slug === p1);
+  const basePlan2 = company2?.plans?.find(p => p.id === p2 || p.slug === p2);
+
+  // Load detailed CMS sections for plans from Supabase backend
+  useEffect(() => {
+    let mounted = true;
+    if (company1 && basePlan1) {
+      const cSlug = company1.slug || company1.id;
+      const pSlug = basePlan1.slug || basePlan1.id;
+      fetchPublicPlan(cSlug, pSlug).then(res => {
+        if (mounted && res.success && res.data) {
+          setDynamicPlan1Data(res.data);
+        }
+      });
+    }
+    if (company2 && basePlan2) {
+      const cSlug = company2.slug || company2.id;
+      const pSlug = basePlan2.slug || basePlan2.id;
+      fetchPublicPlan(cSlug, pSlug).then(res => {
+        if (mounted && res.success && res.data) {
+          setDynamicPlan2Data(res.data);
+        }
+      });
+    }
+    return () => { mounted = false; };
+  }, [c1, c2, p1, p2]);
+
+  const plan1 = useMemo(() => {
+    if (!basePlan1) return null;
+    if (dynamicPlan1Data) {
+      return {
+        ...basePlan1,
+        planData: {
+          ...(basePlan1.planData || {}),
+          ...dynamicPlan1Data
+        }
+      };
+    }
+    return basePlan1;
+  }, [basePlan1, dynamicPlan1Data]);
+
+  const plan2 = useMemo(() => {
+    if (!basePlan2) return null;
+    if (dynamicPlan2Data) {
+      return {
+        ...basePlan2,
+        planData: {
+          ...(basePlan2.planData || {}),
+          ...dynamicPlan2Data
+        }
+      };
+    }
+    return basePlan2;
+  }, [basePlan2, dynamicPlan2Data]);
 
   const hasValidParams = company1 && company2 && plan1 && plan2;
 

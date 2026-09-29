@@ -364,7 +364,34 @@ export default function StarHealthPlanDetailSection({ plan, company, planId: pla
 
   // Resolve to canonical Star Health plan ID — each plan gets independent data
   const currentPlanId = resolveStarHealthPlanId(planIdProp || plan?.id || urlPlanId);
-  const planData = getStarHealthPlanData(currentPlanId);
+  const staticPlanData = getStarHealthPlanData(currentPlanId);
+  const planData = React.useMemo(() => {
+    if (!plan || !plan.featuresSections || plan.featuresSections.length === 0) {
+      return staticPlanData;
+    }
+    return {
+      ...staticPlanData,
+      ...plan,
+      featuresSections: (plan.featuresSections && plan.featuresSections.length > 0)
+        ? plan.featuresSections
+        : staticPlanData?.featuresSections,
+      reportCard: (plan.reportCard && (plan.reportCard.csr || plan.reportCard.allMetrics?.length > 0))
+        ? plan.reportCard
+        : staticPlanData?.reportCard,
+      companyStrength: (plan.companyStrength && (plan.companyStrength.ownership || plan.companyStrength.items?.length > 0))
+        ? plan.companyStrength
+        : staticPlanData?.companyStrength,
+      limitationsWaitingPeriods: (plan.limitationsWaitingPeriods?.items && plan.limitationsWaitingPeriods.items.length > 0)
+        ? plan.limitationsWaitingPeriods
+        : staticPlanData?.limitationsWaitingPeriods,
+      mustKnow: (plan.mustKnow?.items && plan.mustKnow.items.length > 0)
+        ? plan.mustKnow
+        : staticPlanData?.mustKnow,
+      bestSuitedFor: (plan.bestSuitedFor?.profiles && plan.bestSuitedFor.profiles.length > 0)
+        ? plan.bestSuitedFor
+        : staticPlanData?.bestSuitedFor
+    };
+  }, [plan, staticPlanData]);
   const uiConfig = planData?.uiConfig ?? {};
   const demoVideoUrl = uiConfig.demoVideoUrl ?? DEFAULT_DEMO_VIDEO_URL;
   const { logo, name } = company;

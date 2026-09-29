@@ -493,7 +493,34 @@ export default function HdfcPlanDetailSection({ plan, company, planId: planIdPro
   const isOptimaSecurePlus = isHdfcPlan(currentPlanId, 'hdfc-optima-secure-plus');
   const staticPlanData = getHdfcPlanData(currentPlanId);
   const { data: dynamicOptimaData } = useOptimaSecurePlusData();
-  const planData = isOptimaSecurePlus ? dynamicOptimaData : staticPlanData;
+  const basePlanData = isOptimaSecurePlus ? dynamicOptimaData : staticPlanData;
+  const planData = React.useMemo(() => {
+    if (!plan || !plan.featuresSections || plan.featuresSections.length === 0) {
+      return basePlanData;
+    }
+    return {
+      ...basePlanData,
+      ...plan,
+      featuresSections: (plan.featuresSections && plan.featuresSections.length > 0)
+        ? plan.featuresSections
+        : basePlanData?.featuresSections,
+      reportCard: (plan.reportCard && (plan.reportCard.csr || plan.reportCard.allMetrics?.length > 0))
+        ? plan.reportCard
+        : basePlanData?.reportCard,
+      companyStrength: (plan.companyStrength && (plan.companyStrength.ownership || plan.companyStrength.items?.length > 0))
+        ? plan.companyStrength
+        : basePlanData?.companyStrength,
+      limitationsWaitingPeriods: (plan.limitationsWaitingPeriods?.items && plan.limitationsWaitingPeriods.items.length > 0)
+        ? plan.limitationsWaitingPeriods
+        : basePlanData?.limitationsWaitingPeriods,
+      mustKnow: (plan.mustKnow?.items && plan.mustKnow.items.length > 0)
+        ? plan.mustKnow
+        : basePlanData?.mustKnow,
+      bestSuitedFor: (plan.bestSuitedFor?.profiles && plan.bestSuitedFor.profiles.length > 0)
+        ? plan.bestSuitedFor
+        : basePlanData?.bestSuitedFor
+    };
+  }, [plan, basePlanData]);
   const uiConfig = planData?.uiConfig ?? {};
   const primaryColor = uiConfig.primaryColor ?? '#E30613';
   const demoVideoUrl = uiConfig.demoVideoUrl ?? DEFAULT_DEMO_VIDEO_URL;

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiAlertCircle } from 'react-icons/fi';
 import { companiesData } from '../data/companies';
+import { fetchPublicCompanies } from '../services/publicApiService';
 
 export default function CompareForm({
   onClose,
@@ -13,6 +14,19 @@ export default function CompareForm({
   initialPlan2Id
 }) {
   const navigate = useNavigate();
+
+  // Dynamic companies list from Supabase with instant local fallback
+  const [companiesList, setCompaniesList] = useState(companiesData);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchPublicCompanies().then((res) => {
+      if (mounted && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setCompaniesList(res.data);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   // Selection states
   const [company1, setCompany1] = useState(() => {
@@ -149,7 +163,7 @@ export default function CompareForm({
                       transition={{ duration: 0.15 }}
                       className="absolute left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl z-40 max-h-60 overflow-y-auto py-2"
                     >
-                      {companiesData.map((company) => (
+                      {companiesList.map((company) => (
                         <button
                           key={company.id}
                           type="button"
@@ -209,7 +223,7 @@ export default function CompareForm({
                       transition={{ duration: 0.15 }}
                       className="absolute left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl z-40 max-h-60 overflow-y-auto py-2"
                     >
-                      {companiesData.map((company) => {
+                      {companiesList.map((company) => {
                         const isSame = company1 && company.id === company1.id;
                         return (
                           <button

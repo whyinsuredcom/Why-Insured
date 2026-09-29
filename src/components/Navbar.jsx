@@ -8,9 +8,11 @@ import {
 } from 'react-icons/fi';
 import Logo from './Logo';
 import { companiesData } from '../data/companies';
+import { fetchPublicCompanies } from '../services/publicApiService';
 import CompareForm from './CompareForm';
 
 export default function Navbar() {
+  const [companiesList, setCompaniesList] = useState(companiesData);
   const [dropdownOpen, setDropdownOpen] = useState(false); // Desktop Health Insurance hover open
   const [hoveredCompanyId, setHoveredCompanyId] = useState(null); // Active company for separate side dropdown
   const [sideMenuTop, setSideMenuTop] = useState(0); // Vertical offset aligned with hovered company
@@ -77,8 +79,26 @@ export default function Navbar() {
     return location.pathname === path;
   };
 
+  // Load live companies from Supabase backend API
+  useEffect(() => {
+    let isMounted = true;
+    fetchPublicCompanies().then(res => {
+      if (isMounted && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setCompaniesList(prev => res.data.map(liveComp => {
+          const staticMatch = prev.find(p => p.id === liveComp.id || p.slug === liveComp.slug);
+          return {
+            ...staticMatch,
+            ...liveComp,
+            plans: liveComp.plans && liveComp.plans.length > 0 ? liveComp.plans : staticMatch?.plans
+          };
+        }));
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   const hoveredCompany = hoveredCompanyId
-    ? companiesData.find(c => c.id === hoveredCompanyId)
+    ? companiesList.find(c => c.id === hoveredCompanyId)
     : null;
 
   const hoveredCompanyPlans = hoveredCompany?.plans
@@ -202,7 +222,7 @@ export default function Navbar() {
                           Supported Providers
                         </span>
                         <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                          {companiesData.length} Companies
+                          {companiesList.length} Companies
                         </span>
                       </div>
                       
@@ -211,7 +231,7 @@ export default function Navbar() {
                         className="px-2 space-y-1 overflow-y-auto overscroll-contain max-h-[380px] sm:max-h-[calc(100vh-180px)] pr-1"
                         style={{ scrollbarWidth: 'thin' }}
                       >
-                        {companiesData.map((company) => {
+                        {companiesList.map((company) => {
                           const isHovered = hoveredCompanyId === company.id;
                           return (
                             <div

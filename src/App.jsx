@@ -17,9 +17,17 @@ import ClaimPage from './pages/ClaimPage';
 import AcademyPage from './pages/AcademyPage';
 import HospitalPage from './pages/HospitalPage';
 import UploadPolicy from './pages/UploadPolicy';
-import AdminOptimaSecurePlus from './pages/AdminOptimaSecurePlus';
-import AdminLogin from './pages/AdminLogin';
-import AdminProtectedRoute from './components/AdminProtectedRoute';
+// Admin Panel Components & Pages
+import { AdminAuthProvider } from './admin/context/AdminAuthContext';
+import { ToastProvider } from './admin/components/Toast';
+import AdminProtectedRoute from './admin/components/AdminProtectedRoute';
+import AdminLayout from './admin/layouts/AdminLayout';
+import LoginPage from './admin/pages/LoginPage';
+import DashboardPage from './admin/pages/DashboardPage';
+import CompaniesPage from './admin/pages/CompaniesPage';
+import PlansPage from './admin/pages/PlansPage';
+import PlanEditorPage from './admin/pages/PlanEditorPage';
+import SettingsPage from './admin/pages/SettingsPage';
 
 // Helper to detect if the page was refreshed (F5/Ctrl+R/Browser Reload)
 const isPageRefresh = () => {
@@ -68,20 +76,32 @@ function App() {
   // =========================================================================
   if (isAdminRoute) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] antialiased font-sans">
-        <Routes location={location}>
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route
-            path="/admin/optima-secure-plus"
-            element={
-              <AdminProtectedRoute>
-                <AdminOptimaSecurePlus />
-              </AdminProtectedRoute>
-            }
-          />
-          <Route path="/admin/*" element={<Navigate to="/admin/optima-secure-plus" replace />} />
-        </Routes>
-      </div>
+      <AdminAuthProvider>
+        <ToastProvider>
+          <div className="min-h-screen bg-[#F8FAFC] antialiased font-sans">
+            <Routes location={location}>
+              <Route path="/admin/login" element={<LoginPage />} />
+              <Route
+                path="/admin"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout />
+                  </AdminProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="dashboard" element={<DashboardPage />} />
+                <Route path="companies" element={<CompaniesPage />} />
+                <Route path="plans" element={<PlansPage />} />
+                <Route path="plans/:planId" element={<PlanEditorPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+              </Route>
+              <Route path="*" element={<Navigate to="/admin/login" replace />} />
+            </Routes>
+          </div>
+        </ToastProvider>
+      </AdminAuthProvider>
     );
   }
 

@@ -3,14 +3,35 @@ import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowLeft, FiCheck, FiChevronRight, FiArrowRight, FiFileText, FiX, FiGlobe, FiExternalLink } from 'react-icons/fi';
 import { companiesData } from '../data/companies';
+import { fetchPublicCompanies } from '../services/publicApiService';
 
 export default function CompanyDetail() {
   const { companyId } = useParams();
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
   
-  const company = companiesData.find(
+  const [company, setCompany] = useState(() => companiesData.find(
     c => c.slug === companyId || c.id === companyId || (companyId === 'hdfc-life' && (c.id === 'hdfc-ergo' || c.slug === 'hdfc-ergo'))
-  );
+  ));
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchPublicCompanies().then(res => {
+      if (isMounted && res.success && Array.isArray(res.data)) {
+        const found = res.data.find(
+          c => c.slug === companyId || c.id === companyId || (companyId === 'hdfc-life' && (c.id === 'hdfc-ergo' || c.slug === 'hdfc-ergo'))
+        );
+        if (found) {
+          setCompany(prev => ({
+            ...prev,
+            ...found,
+            plans: found.plans && found.plans.length > 0 ? found.plans : prev?.plans,
+            sources: prev?.sources || found.sources
+          }));
+        }
+      }
+    });
+    return () => { isMounted = false; };
+  }, [companyId]);
 
   // Close sources modal on Escape key press
   useEffect(() => {
