@@ -421,9 +421,9 @@ export default function StandardPlanDetailSection({ plan, company, planId: planI
 
   const currentPlanId = planIdProp || plan?.id || plan?.slug || urlPlanId;
 
-  // Resolve theme & colors from company and plan
-  const primaryColor = plan?.uiConfig?.primaryColor || plan?.theme_primary || company?.theme?.primary || company?.primary_color || '#0038A8';
-  const secondaryColor = plan?.uiConfig?.lightBg || plan?.theme_secondary || company?.theme?.secondary || company?.secondary_color || '#F0F4FF';
+  // Company is the strict authoritative source for branding and theme
+  const primaryColor = company?.theme?.primary || company?.primary_color || '#0038A8';
+  const secondaryColor = company?.theme?.secondary || company?.secondary_color || '#F0F4FF';
   const logo = company?.logo || plan?.companyLogo || '';
   const companyName = company?.name || plan?.companyName || 'Insurance Provider';
 

@@ -47,8 +47,6 @@ export default function PlansPage() {
     description: '',
     logo: '',
     coverage: '₹5 Lakh – ₹1 Crore',
-    primary_color: '#0038A8',
-    secondary_color: '#F0F4FF',
     status: 'active',
     is_published: true
   });
@@ -110,8 +108,6 @@ export default function PlansPage() {
       description: '',
       logo: defaultComp.logo || '',
       coverage: '₹5 Lakh – ₹1 Crore',
-      primary_color: defaultComp.primary_color || '#0038A8',
-      secondary_color: defaultComp.secondary_color || '#F0F4FF',
       status: 'active',
       is_published: true
     });
@@ -130,8 +126,6 @@ export default function PlansPage() {
       description: plan.description || '',
       logo: plan.logo || '',
       coverage: plan.coverage || '₹5 Lakh – ₹1 Crore',
-      primary_color: plan.primary_color || '#0038A8',
-      secondary_color: plan.secondary_color || '#F0F4FF',
       status: plan.status || 'active',
       is_published: plan.is_published !== undefined ? plan.is_published : true
     });
@@ -153,9 +147,7 @@ export default function PlansPage() {
     setFormData((prev) => ({
       ...prev,
       company_id: compId,
-      logo: prev.logo || comp?.logo || '',
-      primary_color: prev.primary_color || comp?.primary_color || '#0038A8',
-      secondary_color: prev.secondary_color || comp?.secondary_color || '#F0F4FF'
+      logo: comp?.logo || prev.logo || ''
     }));
   };
 
@@ -168,12 +160,18 @@ export default function PlansPage() {
 
     try {
       setSaving(true);
+      const parentComp = companies.find((c) => c.id === formData.company_id);
+      const payload = {
+        ...formData,
+        primary_color: parentComp?.primary_color || '#0038A8',
+        secondary_color: parentComp?.secondary_color || '#F0F4FF'
+      };
       if (editingPlan) {
-        await adminApi.updatePlan(editingPlan.id, formData);
+        await adminApi.updatePlan(editingPlan.id, payload);
         invalidatePublicCache();
         toast.success(`Plan '${formData.name}' updated`);
       } else {
-        const res = await adminApi.createPlan(formData);
+        const res = await adminApi.createPlan(payload);
         invalidatePublicCache();
         toast.success(`Created plan '${formData.name}'`);
         setModalOpen(false);
@@ -330,16 +328,24 @@ export default function PlansPage() {
                     {/* Plan Info */}
                     <td className="py-4 px-5">
                       <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs shadow-2xs overflow-hidden border border-slate-200/80"
-                          style={{ backgroundColor: plan.secondary_color || '#F0F4FF', color: plan.primary_color || '#0038A8' }}
-                        >
-                          {plan.logo ? (
-                            <img src={plan.logo} alt={plan.name} className="w-full h-full object-contain p-1" />
-                          ) : (
-                            <FiLayers className="text-base" />
-                          )}
-                        </div>
+                        {(() => {
+                          const comp = companies.find((c) => c.id === plan.company_id);
+                          const pColor = comp?.primary_color || plan.primary_color || '#0038A8';
+                          const sColor = comp?.secondary_color || plan.secondary_color || '#F0F4FF';
+                          const pLogo = comp?.logo || plan.logo;
+                          return (
+                            <div
+                              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs shadow-2xs overflow-hidden border border-slate-200/80"
+                              style={{ backgroundColor: sColor, color: pColor }}
+                            >
+                              {pLogo ? (
+                                <img src={pLogo} alt={plan.name} className="w-full h-full object-contain p-1" />
+                              ) : (
+                                <FiLayers className="text-base" />
+                              )}
+                            </div>
+                          );
+                        })()}
                         <div>
                           <div className="font-bold text-slate-900 text-sm leading-snug group-hover:text-emerald-600 transition-colors flex items-center gap-2">
                             <span>{plan.name}</span>
@@ -542,43 +548,28 @@ export default function PlansPage() {
                 onChange={(logo) => setFormData({ ...formData, logo })}
               />
 
-              {/* Colors */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Inherited Company Branding Notice */}
+              <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">Theme Primary Color</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={formData.primary_color}
-                      onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
-                      className="w-10 h-10 p-0 border-0 rounded-xl cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={formData.primary_color}
-                      onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
-                      className="flex-grow px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs uppercase"
-                    />
-                  </div>
+                  <span className="text-xs font-bold text-slate-800 block">Theme &amp; Branding</span>
+                  <span className="text-[11px] text-slate-500">Inherited automatically from parent company</span>
                 </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">Theme Secondary (Light Bg)</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={formData.secondary_color}
-                      onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
-                      className="w-10 h-10 p-0 border-0 rounded-xl cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={formData.secondary_color}
-                      onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
-                      className="flex-grow px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs uppercase"
-                    />
-                  </div>
-                </div>
+                {formData.company_id && (() => {
+                  const comp = companies.find((c) => c.id === formData.company_id);
+                  if (!comp) return null;
+                  return (
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-5 h-5 rounded-full border border-slate-300 shadow-2xs"
+                        style={{ backgroundColor: comp.primary_color || '#0038A8' }}
+                        title={`Parent Company Primary Color: ${comp.primary_color || '#0038A8'}`}
+                      />
+                      <span className="text-xs font-mono font-semibold text-slate-600">
+                        {comp.primary_color || '#0038A8'}
+                      </span>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div>

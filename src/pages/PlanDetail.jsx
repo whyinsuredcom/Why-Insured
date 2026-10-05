@@ -79,7 +79,7 @@ export default function PlanDetail() {
   }, [companyId, planId]);
 
   // Company resolution (dynamic from API or static fallback)
-  const company = staticCompany || (dynamicPlan?.company ? {
+  const baseCompany = staticCompany || (dynamicPlan?.company ? {
     id: dynamicPlan.company.id || dynamicPlan.company.slug || companyId,
     slug: dynamicPlan.company.slug || companyId,
     name: dynamicPlan.company.name || dynamicPlan.companyName || companyId,
@@ -87,14 +87,29 @@ export default function PlanDetail() {
     logo: dynamicPlan.company.logo || dynamicPlan.companyLogo || '',
     description: dynamicPlan.company.description || '',
     theme: {
-      primary: dynamicPlan.company.primary_color || dynamicPlan.theme_primary || '#0038A8',
-      secondary: dynamicPlan.company.secondary_color || dynamicPlan.theme_secondary || '#F0F4FF',
-      accent: dynamicPlan.company.primary_color || dynamicPlan.theme_primary || '#0038A8',
+      primary: dynamicPlan.company.primary_color || '#0038A8',
+      secondary: dynamicPlan.company.secondary_color || '#F0F4FF',
+      accent: dynamicPlan.company.primary_color || '#0038A8',
       background: dynamicPlan.company.secondary_color || '#F0F4FF',
       text: '#0F172A'
     },
     plans: []
   } : null);
+
+  // If dynamic plan has company branding from API (authoritative source if updated in Admin Panel), use it
+  const company = baseCompany ? {
+    ...baseCompany,
+    logo: dynamicPlan?.company?.logo || baseCompany.logo,
+    primary_color: dynamicPlan?.company?.primary_color || baseCompany.primary_color || baseCompany.theme?.primary || '#0038A8',
+    secondary_color: dynamicPlan?.company?.secondary_color || baseCompany.secondary_color || baseCompany.theme?.secondary || '#F0F4FF',
+    theme: {
+      ...baseCompany.theme,
+      primary: dynamicPlan?.company?.primary_color || baseCompany.theme?.primary || '#0038A8',
+      secondary: dynamicPlan?.company?.secondary_color || baseCompany.theme?.secondary || '#F0F4FF',
+      accent: dynamicPlan?.company?.primary_color || baseCompany.theme?.accent || baseCompany.theme?.primary || '#0038A8',
+      background: dynamicPlan?.company?.secondary_color || baseCompany.theme?.background || '#F8FAFC'
+    }
+  } : null;
 
   const isHdfcErgo = company?.id === 'hdfc-ergo' || company?.id === 'hdfc-life' || company?.slug === 'hdfc-ergo' || company?.slug === 'hdfc-life';
 

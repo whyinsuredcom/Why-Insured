@@ -48,8 +48,6 @@ export default function PlanEditorPage() {
     subtitle: '',
     description: '',
     coverage: '',
-    theme_primary: '#0038A8',
-    theme_secondary: '#F0F4FF',
     status: 'active'
   });
   const [savingBasic, setSavingBasic] = useState(false);
@@ -86,8 +84,6 @@ export default function PlanEditorPage() {
           subtitle: p.subtitle || p.tagline || '',
           description: p.description || '',
           coverage: p.coverage || '',
-          theme_primary: p.theme_primary || p.primary_color || '#0038A8',
-          theme_secondary: p.theme_secondary || p.secondary_color || '#F0F4FF',
           status: p.status || 'active'
         });
       }
@@ -102,7 +98,8 @@ export default function PlanEditorPage() {
     e.preventDefault();
     try {
       setSavingBasic(true);
-      await adminApi.updatePlan(plan.id, basicForm);
+      const { theme_primary, theme_secondary, ...payload } = basicForm;
+      await adminApi.updatePlan(plan.id, payload);
       invalidatePublicCache();
       toast.success('Basic plan information updated');
       loadPlanData();
@@ -411,7 +408,7 @@ export default function PlanEditorPage() {
         <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs max-w-3xl space-y-6">
           <div className="pb-4 border-b border-slate-100">
             <h2 className="text-base font-bold text-slate-900">Basic Plan Information</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Edit core naming, descriptions, coverage range, and branding colors</p>
+            <p className="text-xs text-slate-500 mt-0.5">Edit core naming, descriptions, and coverage range (Theme is inherited from company)</p>
           </div>
 
           <form onSubmit={handleSaveBasic} className="space-y-4 text-xs font-medium text-slate-700">
@@ -459,41 +456,23 @@ export default function PlanEditorPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Inherited Company Branding Notice */}
+            <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between">
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">Theme Primary Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={basicForm.theme_primary}
-                    onChange={(e) => setBasicForm({ ...basicForm, theme_primary: e.target.value })}
-                    className="w-9 h-9 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={basicForm.theme_primary}
-                    onChange={(e) => setBasicForm({ ...basicForm, theme_primary: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono"
-                  />
-                </div>
+                <span className="text-xs font-bold text-slate-800 block">Theme &amp; Branding</span>
+                <span className="text-[11px] text-slate-500">
+                  Inherited automatically from {plan?.companyName || plan?.company?.name || 'parent company'}
+                </span>
               </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">Theme Secondary Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={basicForm.theme_secondary}
-                    onChange={(e) => setBasicForm({ ...basicForm, theme_secondary: e.target.value })}
-                    className="w-9 h-9 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={basicForm.theme_secondary}
-                    onChange={(e) => setBasicForm({ ...basicForm, theme_secondary: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono"
-                  />
-                </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-5 h-5 rounded-full border border-slate-300 shadow-2xs"
+                  style={{ backgroundColor: plan?.company?.primary_color || plan?.theme_primary || '#0038A8' }}
+                  title="Parent Company Primary Color"
+                />
+                <span className="text-xs font-mono font-semibold text-slate-600">
+                  {plan?.company?.primary_color || plan?.theme_primary || '#0038A8'}
+                </span>
               </div>
             </div>
 
