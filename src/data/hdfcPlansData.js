@@ -38,7 +38,7 @@ export const HDFC_PLANS_DATA = {
  */
 export const getHdfcPlanData = (planId) => {
   const canonicalId = resolveHdfcPlanId(planId);
-  return HDFC_PLANS_DATA[canonicalId] || optimaSecurePlusData;
+  return HDFC_PLANS_DATA[canonicalId] || null;
 };
 
 /** All registered canonical plan IDs (for validation & listing) */

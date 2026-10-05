@@ -14,7 +14,7 @@ export const ICICI_LOMBARD_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveIciciPlanId = (planId) => {
-  if (!planId) return 'elevate';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (cleanId === 'elevate' || cleanId === 'icici-elevate' || cleanId === 'icici-lombard-elevate' || cleanId === 'elevate-plan') {
     return 'elevate';
@@ -1439,5 +1439,5 @@ export const ICICI_LOMBARD_PLANS_DATA = {
 
 export const getIciciPlanData = (planId) => {
   const canonicalId = resolveIciciPlanId(planId);
-  return ICICI_LOMBARD_PLANS_DATA[canonicalId] || ICICI_LOMBARD_PLANS_DATA['elevate'];
+  return ICICI_LOMBARD_PLANS_DATA[canonicalId] || null;
 };

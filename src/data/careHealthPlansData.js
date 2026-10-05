@@ -16,7 +16,7 @@ export const CARE_HEALTH_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveCarePlanId = (planId) => {
-  if (!planId) return 'care-supreme';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'care-freedom' ||
@@ -2602,5 +2602,5 @@ export const CARE_HEALTH_PLANS_DATA = {
 
 export const getCarePlanData = (planId) => {
   const canonicalId = resolveCarePlanId(planId);
-  return CARE_HEALTH_PLANS_DATA[canonicalId] || CARE_HEALTH_PLANS_DATA['care-supreme'];
+  return CARE_HEALTH_PLANS_DATA[canonicalId] || null;
 };

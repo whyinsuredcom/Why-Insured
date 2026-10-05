@@ -55,7 +55,7 @@ export const TATA_AIG_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveTataAigPlanId = (planId) => {
-  if (!planId) return 'medicare-premier';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'medicare-premier' ||
@@ -1778,5 +1778,5 @@ export const TATA_AIG_PLANS_DATA = {
 
 export const getTataAigPlanData = (planId) => {
   const canonicalId = resolveTataAigPlanId(planId);
-  return TATA_AIG_PLANS_DATA[canonicalId] || TATA_AIG_PLANS_DATA['medicare-premier'];
+  return TATA_AIG_PLANS_DATA[canonicalId] || null;
 };

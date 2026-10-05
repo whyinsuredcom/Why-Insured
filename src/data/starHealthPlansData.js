@@ -33,7 +33,7 @@ export const STAR_HEALTH_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveStarHealthPlanId = (planId) => {
-  if (!planId) return 'star-women-care';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'star-health-assure' ||
@@ -103,7 +103,7 @@ export const resolveStarHealthPlanId = (planId) => {
   ) {
     return 'star-super-star';
   }
-  return 'star-women-care';
+  return cleanId;
 };
 
 export const STAR_HEALTH_PLANS_DATA = {
@@ -1438,5 +1438,5 @@ export const STAR_HEALTH_PLANS_DATA = {
 
 export const getStarHealthPlanData = (planId) => {
   const canonicalId = resolveStarHealthPlanId(planId);
-  return STAR_HEALTH_PLANS_DATA[canonicalId] || STAR_HEALTH_PLANS_DATA['star-women-care'];
+  return STAR_HEALTH_PLANS_DATA[canonicalId] || null;
 };

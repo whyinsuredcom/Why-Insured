@@ -71,37 +71,28 @@ export default function PlanDetail() {
 
   const isHdfcErgo = company?.id === 'hdfc-ergo' || company?.id === 'hdfc-life';
 
-  // Static plan fallback
+  // Static plan fallback (strict match by ID or slug)
   const staticPlan = isHdfcErgo
     ? findHdfcPlan(company, planId)
-    : company?.plans?.find(p => p.id === planId) ||
-    (company?.id === 'tata-aig' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'icici-lombard' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'niva-bupa' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'star-health' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'care-health' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'reliance-general' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'magma-hdi' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'manipal-cigna' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'aditya-birla' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'bajaj-general' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'sbi-general' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null) ||
-    (company?.id === 'acko' ? (company?.plans?.find(p => p.id === planId) || company?.plans?.[0]) : null);
+    : company?.plans?.find(p => p.id === planId || p.slug === planId);
+
+  // Static plan fallback (strict match by ID or slug)
+  const isMatchingStaticPlan = staticPlan && (staticPlan.id === planId || staticPlan.slug === planId);
 
   // Active plan merging dynamic CMS data
   const plan = dynamicPlan ? {
-    ...staticPlan,
+    ...(isMatchingStaticPlan ? staticPlan : {}),
     ...dynamicPlan,
-    name: dynamicPlan.name || staticPlan?.name,
-    description: dynamicPlan.description || dynamicPlan.tagline || staticPlan?.description,
-    coverage: dynamicPlan.coverage || staticPlan?.coverage,
+    name: dynamicPlan.name || (isMatchingStaticPlan ? staticPlan?.name : ''),
+    description: dynamicPlan.description || dynamicPlan.tagline || (isMatchingStaticPlan ? staticPlan?.description : ''),
+    coverage: dynamicPlan.coverage || (isMatchingStaticPlan ? staticPlan?.coverage : ''),
     details: {
-      ...staticPlan?.details,
+      ...(isMatchingStaticPlan ? staticPlan?.details : {}),
       ...dynamicPlan.details
     }
-  } : staticPlan;
+  } : (isMatchingStaticPlan ? staticPlan : null);
 
-  const hdfcCanonicalPlanId = isHdfcErgo ? resolveHdfcPlanId(planId) : null;
+  const hdfcCanonicalPlanId = isHdfcErgo ? (resolveHdfcPlanId(planId) || planId) : null;
 
   if (!company || !plan) {
     return (
@@ -196,7 +187,7 @@ export default function PlanDetail() {
     '--text': theme.text,
   };
 
-  const isSpecialCompany = company.id === 'hdfc-life' || company.id === 'hdfc-ergo' || company.id === 'tata-aig' || company.id === 'icici-lombard' || company.id === 'niva-bupa' || company.id === 'star-health' || company.id === 'care-health' || company.id === 'reliance-general' || company.id === 'magma-hdi' || company.id === 'manipal-cigna' || company.id === 'aditya-birla' || company.id === 'bajaj-general' || company.id === 'sbi-general';
+  const isSpecialCompany = company.id === 'hdfc-life' || company.id === 'hdfc-ergo' || company.id === 'tata-aig' || company.id === 'icici-lombard' || company.id === 'niva-bupa' || company.id === 'star-health' || company.id === 'care-health' || company.id === 'reliance-general' || company.id === 'magma-hdi' || company.id === 'manipal-cigna' || company.id === 'aditya-birla' || company.id === 'bajaj-general' || company.id === 'sbi-general' || company.id === 'acko';
 
   return (
     <div style={{ ...themeStyles, backgroundColor: 'var(--bg)' }} className={`min-h-screen font-sans ${isSpecialCompany ? 'pt-[88px] sm:pt-24 pb-2 sm:pb-20' : 'pt-24 pb-20'} relative transition-colors duration-300`}>

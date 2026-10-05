@@ -476,7 +476,7 @@ export const MANIPAL_CIGNA_BENEFIT_LIBRARY = {
 };
 
 export const resolveManipalCignaPlanId = (planId) => {
-  if (!planId) return 'lifetime-health';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'sarvah-uttam' ||
@@ -2590,5 +2590,5 @@ export const MANIPAL_CIGNA_PLANS_DATA = {
  */
 export const getManipalCignaPlanData = (planId) => {
   const canonicalId = resolveManipalCignaPlanId(planId);
-  return MANIPAL_CIGNA_PLANS_DATA[canonicalId] || MANIPAL_CIGNA_PLANS_DATA['lifetime-health'];
+  return MANIPAL_CIGNA_PLANS_DATA[canonicalId] || null;
 };

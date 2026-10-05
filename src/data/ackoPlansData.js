@@ -1729,7 +1729,7 @@ export const ACKO_PLANS_DATA = {
 };
 
 export const resolveAckoPlanId = (planId) => {
-  if (!planId) return 'platinum-super-top-up';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'platinum' ||
@@ -1761,10 +1761,10 @@ export const resolveAckoPlanId = (planId) => {
   ) {
     return 'platinum-super-top-up';
   }
-  return 'platinum-super-top-up';
+  return cleanId;
 };
 
 export const getAckoPlanData = (planId) => {
   const canonicalId = resolveAckoPlanId(planId);
-  return ACKO_PLANS_DATA[canonicalId] || ACKO_PLANS_DATA['platinum-super-top-up'];
+  return ACKO_PLANS_DATA[canonicalId] || null;
 };

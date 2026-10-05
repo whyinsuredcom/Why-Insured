@@ -51,14 +51,14 @@ export const HDFC_PLAN_ID_ALIASES = {
  * Defaults to Optima Secure+ for any HDFC route.
  */
 export function resolveHdfcPlanId(planId) {
-  if (!planId) return 'hdfc-optima-secure-plus';
+  if (!planId) return null;
   const normalized = String(planId).toLowerCase().trim();
 
   if (HDFC_CANONICAL_PLAN_IDS.includes(normalized)) {
     return normalized;
   }
 
-  return HDFC_PLAN_ID_ALIASES[normalized] ?? 'hdfc-optima-secure-plus';
+  return HDFC_PLAN_ID_ALIASES[normalized] ?? normalized;
 }
 
 /**
@@ -67,7 +67,7 @@ export function resolveHdfcPlanId(planId) {
 export function findHdfcPlan(company, planId) {
   if (!company?.plans || company.plans.length === 0) return null;
   const canonicalId = resolveHdfcPlanId(planId);
-  return company.plans.find((p) => p.id === canonicalId) || company.plans[0];
+  return company.plans.find((p) => p.id === canonicalId || p.slug === canonicalId || p.id === planId || p.slug === planId) || null;
 }
 
 /** Check whether a plan ID belongs to a specific canonical plan */

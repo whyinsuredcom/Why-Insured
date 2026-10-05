@@ -1802,7 +1802,7 @@ export const SBI_PLANS_DATA = {
 };
 
 export const resolveSbiPlanId = (planId) => {
-  if (!planId) return 'super-health-insurance';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'health-alpha' ||
@@ -1831,11 +1831,11 @@ export const resolveSbiPlanId = (planId) => {
   ) {
     return 'super-health-insurance';
   }
-  return 'super-health-insurance';
+  return cleanId;
 };
 
 export const getSbiPlanData = (planId) => {
   const canonicalId = resolveSbiPlanId(planId);
-  return SBI_PLANS_DATA[canonicalId] || SBI_PLANS_DATA['super-health-insurance'];
+  return SBI_PLANS_DATA[canonicalId] || null;
 };
 

@@ -27,7 +27,7 @@ export const ADITYA_BIRLA_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveAdityaBirlaPlanId = (planId) => {
-  if (!planId) return 'one-max';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim().replace(/_/g, '-').replace(/\+/g, '-plus');
   if (
     cleanId === 'activ-yuva' ||
@@ -2960,5 +2960,5 @@ export const ADITYA_BIRLA_PLANS_DATA = {
 
 export const getAdityaBirlaPlanData = (planId) => {
   const canonicalId = resolveAdityaBirlaPlanId(planId);
-  return ADITYA_BIRLA_PLANS_DATA[canonicalId] || ADITYA_BIRLA_PLANS_DATA['one-max'];
+  return ADITYA_BIRLA_PLANS_DATA[canonicalId] || null;
 };

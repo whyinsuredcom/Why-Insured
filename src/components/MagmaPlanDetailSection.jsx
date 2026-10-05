@@ -414,8 +414,41 @@ export default function MagmaPlanDetailSection({ plan, company, planId: planIdPr
   const isFeaturesPage = location.pathname.endsWith('/features');
 
   // Resolve to canonical Magma plan ID — One Health Secure
-  const currentPlanId = resolveMagmaPlanId(planIdProp || plan?.id || urlPlanId);
-  const planData = getMagmaPlanData(currentPlanId);
+  const currentPlanId = resolveMagmaPlanId(planIdProp || plan?.id || urlPlanId) || planIdProp || plan?.id || urlPlanId;
+  const staticPlanData = getMagmaPlanData(currentPlanId);
+  const isMatchingStatic = Boolean(staticPlanData && (staticPlanData.planId === currentPlanId || staticPlanData.id === currentPlanId));
+  const matchedStatic = isMatchingStatic ? staticPlanData : null;
+  const planData = React.useMemo(() => {
+    if (plan) {
+      return {
+        ...matchedStatic,
+        ...plan,
+        planName: plan.name || plan.planName || matchedStatic?.planName || currentPlanId,
+        featuresSections: (plan.featuresSections && plan.featuresSections.length > 0)
+          ? plan.featuresSections
+          : (matchedStatic?.featuresSections || []),
+        reportCard: (plan.reportCard && (plan.reportCard.csr || (plan.reportCard.allMetrics && plan.reportCard.allMetrics.length > 0) || (plan.reportCard.items && plan.reportCard.items.length > 0)))
+          ? plan.reportCard
+          : (matchedStatic?.reportCard || null),
+        companyStrength: (plan.companyStrength && (plan.companyStrength.ownership || (plan.companyStrength.items && plan.companyStrength.items.length > 0)))
+          ? plan.companyStrength
+          : (matchedStatic?.companyStrength || null),
+        limitationsWaitingPeriods: (plan.limitationsWaitingPeriods?.items && plan.limitationsWaitingPeriods.items.length > 0)
+          ? plan.limitationsWaitingPeriods
+          : (matchedStatic?.limitationsWaitingPeriods || { items: [] }),
+        mustKnow: (plan.mustKnow?.items && plan.mustKnow.items.length > 0)
+          ? plan.mustKnow
+          : (matchedStatic?.mustKnow || { items: [] }),
+        bestSuitedFor: ((plan.bestSuitedFor?.profiles && plan.bestSuitedFor.profiles.length > 0) || (plan.bestSuitedFor?.items && plan.bestSuitedFor.items.length > 0))
+          ? plan.bestSuitedFor
+          : (matchedStatic?.bestSuitedFor || { profiles: [] }),
+        variants: (plan.variants && plan.variants.length > 0)
+          ? plan.variants
+          : (matchedStatic?.variants || [])
+      };
+    }
+    return matchedStatic;
+  }, [plan, matchedStatic, currentPlanId]);
   const uiConfig = planData?.uiConfig ?? {};
   const demoVideoUrl = uiConfig.demoVideoUrl ?? DEFAULT_DEMO_VIDEO_URL;
   const { logo, name } = company;
@@ -901,48 +934,6 @@ export default function MagmaPlanDetailSection({ plan, company, planId: planIdPr
               >
                 <FiX className="text-base sm:text-lg" />
               </button>
-
-              {/* Modal Top Tab Navigation Switcher */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-2.5 mb-4 border-b border-slate-100 no-scrollbar pr-8">
-                {[
-                  { id: 'ratio', label: 'Report Card' },
-                  { id: 'fundamental', label: 'Company Strength' },
-                  { id: 'features', label: 'Policy Benefits', isLink: true, url: `/insurance/${company.id}/${currentPlanId}/features` },
-                  { id: 'limitations', label: 'Limitations' },
-                  { id: 'mustKnow', label: 'Must Know Details' },
-                  { id: 'bestSuitedFor', label: 'Perfect For' }
-                ].map((tab) => {
-                  if (tab.isLink) {
-                    return (
-                      <Link
-                        key={tab.id}
-                        to={tab.url}
-                        className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold text-slate-600 hover:text-[#ED1B24] hover:bg-[#FFF5F5] border border-transparent whitespace-nowrap transition-colors select-none"
-                      >
-                        {tab.label}
-                      </Link>
-                    );
-                  }
-                  const isActive = activeModal === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveModal(tab.id);
-                        if (tab.id === 'limitations') setActiveLimitationId(null);
-                      }}
-                      className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold whitespace-nowrap transition-all cursor-pointer select-none ${
-                        isActive
-                          ? 'bg-[#ED1B24] text-white shadow-2xs'
-                          : 'text-slate-600 hover:text-[#ED1B24] hover:bg-[#FFF5F5]'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  );
-                })}
-              </div>
 
               {/* MODAL 1: REPORT CARD */}
               {activeModal === 'ratio' && (

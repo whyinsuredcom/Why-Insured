@@ -9,7 +9,7 @@ export const RELIANCE_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveReliancePlanId = (planId) => {
-  if (!planId) return 'reliance-health-infinity';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'reliance-health-infinity' ||
@@ -19,12 +19,12 @@ export const resolveReliancePlanId = (planId) => {
   ) {
     return 'reliance-health-infinity';
   }
-  return 'reliance-health-infinity';
+  return cleanId;
 };
 
 export const getReliancePlanData = (planId) => {
   const resolvedId = resolveReliancePlanId(planId);
-  return RELIANCE_PLANS_DATA[resolvedId] || RELIANCE_PLANS_DATA['reliance-health-infinity'];
+  return RELIANCE_PLANS_DATA[resolvedId] || null;
 };
 
 export const RELIANCE_PLANS_DATA = {

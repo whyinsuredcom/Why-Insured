@@ -607,7 +607,7 @@ export const BAJAJ_PLANS_DATA = {
 };
 
 export const resolveBajajPlanId = (planId) => {
-  if (!planId) return 'health-guard';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'health-guard' ||
@@ -617,10 +617,10 @@ export const resolveBajajPlanId = (planId) => {
   ) {
     return 'health-guard';
   }
-  return 'health-guard';
+  return cleanId;
 };
 
 export const getBajajPlanData = (planId) => {
   const canonicalId = resolveBajajPlanId(planId);
-  return BAJAJ_PLANS_DATA[canonicalId] || BAJAJ_PLANS_DATA['health-guard'];
+  return BAJAJ_PLANS_DATA[canonicalId] || null;
 };

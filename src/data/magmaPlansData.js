@@ -9,7 +9,7 @@ export const MAGMA_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveMagmaPlanId = (planId) => {
-  if (!planId) return 'magma-one-health-secure';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (
     cleanId === 'magma-one-health-secure' ||
@@ -20,12 +20,12 @@ export const resolveMagmaPlanId = (planId) => {
   ) {
     return 'magma-one-health-secure';
   }
-  return 'magma-one-health-secure';
+  return cleanId;
 };
 
 export const getMagmaPlanData = (planId) => {
   const resolvedId = resolveMagmaPlanId(planId);
-  return MAGMA_PLANS_DATA[resolvedId] || MAGMA_PLANS_DATA['magma-one-health-secure'];
+  return MAGMA_PLANS_DATA[resolvedId] || null;
 };
 
 export const MAGMA_PLANS_DATA = {

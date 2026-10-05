@@ -11,7 +11,7 @@ export const NIVA_BUPA_CANONICAL_PLAN_IDS = [
 ];
 
 export const resolveNivaBupaPlanId = (planId) => {
-  if (!planId) return 'aspire';
+  if (!planId) return null;
   const cleanId = String(planId).toLowerCase().trim();
   if (cleanId === 'aspire' || cleanId === 'niva-aspire' || cleanId === 'niva-bupa-aspire' || cleanId === 'aspire-plan') {
     return 'aspire';
@@ -2784,5 +2784,5 @@ export const NIVA_BUPA_PLANS_DATA = {
 
 export const getNivaBupaPlanData = (planId) => {
   const canonicalId = resolveNivaBupaPlanId(planId);
-  return NIVA_BUPA_PLANS_DATA[canonicalId] || NIVA_BUPA_PLANS_DATA.aspire;
+  return NIVA_BUPA_PLANS_DATA[canonicalId] || null;
 };
