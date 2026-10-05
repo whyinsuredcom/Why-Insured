@@ -16,6 +16,7 @@ import { adminApi } from '../services/adminApi';
 import { useToast } from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import { IconField } from '../components/IconVideoField';
+import { invalidatePublicCache } from '../../services/publicApiService';
 
 export default function CompaniesPage() {
   const [searchParams] = useSearchParams();
@@ -145,9 +146,11 @@ export default function CompaniesPage() {
       setSaving(true);
       if (editingCompany) {
         await adminApi.updateCompany(editingCompany.id, formData);
+        invalidatePublicCache();
         toast.success(`Updated company '${formData.name}'`);
       } else {
         await adminApi.createCompany(formData);
+        invalidatePublicCache();
         toast.success(`Created new company '${formData.name}'`);
       }
       setModalOpen(false);
@@ -162,6 +165,7 @@ export default function CompaniesPage() {
   const handleToggleStatus = async (comp) => {
     try {
       const res = await adminApi.toggleCompanyStatus(comp.id);
+      invalidatePublicCache();
       toast.success(`${comp.name} is now ${res.data.status}`);
       loadCompanies();
     } catch (err) {
@@ -182,6 +186,7 @@ export default function CompaniesPage() {
     try {
       setDeleteModal((prev) => ({ ...prev, loading: true }));
       await adminApi.deleteCompany(deleteModal.company.id, true);
+      invalidatePublicCache();
       toast.success(`Deleted company '${deleteModal.company.name}'`);
       setDeleteModal({ isOpen: false, company: null, loading: false });
       loadCompanies();

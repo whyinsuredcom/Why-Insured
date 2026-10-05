@@ -17,6 +17,7 @@ import { adminApi } from '../services/adminApi';
 import { useToast } from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import { IconField } from '../components/IconVideoField';
+import { invalidatePublicCache } from '../../services/publicApiService';
 
 export default function PlansPage() {
   const [searchParams] = useSearchParams();
@@ -169,9 +170,11 @@ export default function PlansPage() {
       setSaving(true);
       if (editingPlan) {
         await adminApi.updatePlan(editingPlan.id, formData);
+        invalidatePublicCache();
         toast.success(`Plan '${formData.name}' updated`);
       } else {
         const res = await adminApi.createPlan(formData);
+        invalidatePublicCache();
         toast.success(`Created plan '${formData.name}'`);
         setModalOpen(false);
         // Direct redirect to open the new plan editor
@@ -191,6 +194,7 @@ export default function PlansPage() {
     if (e) e.stopPropagation();
     try {
       const res = await adminApi.togglePlanStatus(plan.id);
+      invalidatePublicCache();
       toast.success(`${plan.name} status is now ${res.data.status}`);
       loadData();
     } catch (err) {
@@ -212,6 +216,7 @@ export default function PlansPage() {
     try {
       setDeleteModal((prev) => ({ ...prev, loading: true }));
       await adminApi.deletePlan(deleteModal.plan.id);
+      invalidatePublicCache();
       toast.success(`Deleted plan '${deleteModal.plan.name}'`);
       setDeleteModal({ isOpen: false, plan: null, loading: false });
       loadData();

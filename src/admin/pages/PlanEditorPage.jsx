@@ -26,6 +26,7 @@ import {
   FiHelpCircle
 } from 'react-icons/fi';
 import { adminApi } from '../services/adminApi';
+import { invalidatePublicCache } from '../../services/publicApiService';
 import { useToast } from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import { IconField, VideoField } from '../components/IconVideoField';
@@ -102,6 +103,7 @@ export default function PlanEditorPage() {
     try {
       setSavingBasic(true);
       await adminApi.updatePlan(plan.id, basicForm);
+      invalidatePublicCache();
       toast.success('Basic plan information updated');
       loadPlanData();
     } catch (err) {
@@ -132,6 +134,7 @@ export default function PlanEditorPage() {
       else if (sectionKey === 'mustKnow') await adminApi.reorderMustKnow(reordered);
       else if (sectionKey === 'bestSuited') await adminApi.reorderBestSuited(reordered);
 
+      invalidatePublicCache();
       toast.success('Display order updated');
       loadPlanData();
     } catch (err) {
@@ -151,6 +154,7 @@ export default function PlanEditorPage() {
       else if (sectionType === 'must_know') await adminApi.deleteMustKnowItem(id);
       else if (sectionType === 'best_suited') await adminApi.deleteBestSuitedItem(id);
 
+      invalidatePublicCache();
       toast.success('Item deleted successfully');
       setDeleteModal({ isOpen: false, sectionType: '', id: null, title: '' });
       loadPlanData();
@@ -275,6 +279,7 @@ export default function PlanEditorPage() {
         else await adminApi.createBestSuitedItem(plan.id, formData);
       }
 
+      invalidatePublicCache();
       toast.success(item ? 'Item updated' : 'New item added');
       setItemModal({ isOpen: false, sectionType: '', item: null, formData: {} });
       loadPlanData();
