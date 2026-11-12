@@ -16,6 +16,8 @@ import ComparisonPage from './pages/ComparisonPage';
 import ClaimPage from './pages/ClaimPage';
 import AcademyPage from './pages/AcademyPage';
 import HospitalPage from './pages/HospitalPage';
+import AdvisorsPage from './pages/AdvisorsPage';
+import AdvisorDetailPage from './pages/AdvisorDetailPage';
 import UploadPolicy from './pages/UploadPolicy';
 // Admin Panel Components & Pages
 import { AdminAuthProvider } from './admin/context/AdminAuthContext';
@@ -142,6 +144,8 @@ function App() {
                   <Route path="/insurance/:companyId/:planId/limitations" element={<PlanDetail />} />
                   <Route path="/compare" element={<ComparisonPage />} />
                   <Route path="/claim" element={<ClaimPage />} />
+                  <Route path="/advisors" element={<AdvisorsPage />} />
+                  <Route path="/advisors/:slug" element={<AdvisorDetailPage />} />
                   <Route path="/hospital" element={<HospitalPage />} />
                   <Route path="/academy" element={<AcademyPage />} />
                   <Route path="/upload-policy" element={<UploadPolicy />} />

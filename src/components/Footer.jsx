@@ -21,6 +21,7 @@ export default function Footer() {
     { name: 'Health Insurance', path: '/' },
     { name: 'Compare Plans', path: '/compare' },
     { name: 'Claims', path: '/claim' },
+    { name: 'Advisors', path: '/advisors' },
     { name: 'Insurance Academy', path: '/academy' }
   ];
 

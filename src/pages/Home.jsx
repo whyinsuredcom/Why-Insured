@@ -6,8 +6,7 @@ import {
   FiArrowRight,
   FiShield,
   FiLayers,
-  FiActivity,
-  FiX
+  FiUsers
 } from 'react-icons/fi';
 import { companiesData } from '../data/companies';
 import { searchGlobalInsurance } from '../utils/globalSearchHelper';
@@ -326,7 +325,7 @@ export default function Home() {
           )}
         </motion.div>
 
-        {/* Mobile Hero Navigation Buttons (Insurance, Compare, Hospital, Claim) - Visible ONLY on mobile */}
+        {/* Mobile Hero Navigation Buttons (Insurance, Compare, Advisors, Claim) - Visible ONLY on mobile */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -357,17 +356,15 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* ROW 2: [ Hospital ] [ Claim ] */}
+          {/* ROW 2: [ Advisors ] [ Claim ] */}
           <div className="grid grid-cols-2 gap-2.5 w-full">
-            <a
-              href="https://panel-hospital.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/advisors"
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-full shadow-sm hover:shadow-md hover:border-slate-300 text-slate-700 hover:text-emerald-600 text-xs font-bold transition-all duration-200 cursor-pointer w-full"
             >
-              <FiActivity className="text-[#059669] text-sm shrink-0" />
-              <span>Hospital</span>
-            </a>
+              <FiUsers className="text-[#059669] text-sm shrink-0" />
+              <span>Advisors</span>
+            </Link>
 
             <Link
               to="/claim"
