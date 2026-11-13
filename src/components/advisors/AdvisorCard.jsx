@@ -1,94 +1,132 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiArrowUpRight } from 'react-icons/fi';
+import { FiStar } from 'react-icons/fi';
 import AdvisorAvatar from './AdvisorAvatar';
+import { getAdvisorRatingSummary, subscribeToReviews } from '../../services/reviewService';
 
 /**
- * Premium AdvisorCard Component
- * Equal visual importance, balanced dimensions, consistent subtle green accents.
+ * Minimal & Professional AdvisorCard Component
+ * Contains strictly:
+ * 1. Company logo or individual profile photo
+ * 2. Advisor or company name
+ * 3. Short designation
+ * 4. Star rating and review count
+ * 5. Main insurance specialization
+ * 6. Contact button
+ * 7. View Profile link
  */
-export default function AdvisorCard({ advisor }) {
+export default function AdvisorCard({ advisor, onContact }) {
+  const slug = advisor?.slug || '';
+
+  const [ratingSummary, setRatingSummary] = useState(() =>
+    slug ? getAdvisorRatingSummary(slug) : { hasReviews: false, totalReviews: 0, ratingFormatted: '0.0' }
+  );
+
+  useEffect(() => {
+    if (!slug) return;
+    const unsubscribe = subscribeToReviews((detail) => {
+      if (!detail || detail.slug === String(slug).toLowerCase()) {
+        setRatingSummary(getAdvisorRatingSummary(slug));
+      }
+    });
+    return unsubscribe;
+  }, [slug]);
+
   if (!advisor) return null;
 
   const {
     name,
-    slug,
-    profileImage,
+    designation,
     category,
-    shortDescription,
-    expertise = []
+    specialization,
+    phone = '+91 98765 43210'
   } = advisor;
 
+  const handleContact = (e) => {
+    e.preventDefault();
+    if (onContact) {
+      onContact(advisor);
+    } else {
+      window.location.href = `tel:${phone}`;
+    }
+  };
+
   return (
-    <article className="group relative bg-white rounded-3xl border border-[#E4E7EB] hover:border-[#00A86B]/50 shadow-[0_4px_20px_rgba(16,42,67,0.04)] hover:shadow-[0_16px_36px_rgba(16,42,67,0.08)] transition-all duration-300 flex flex-col justify-between overflow-hidden text-left hover:-translate-y-1.5 h-full">
+    <article className="group bg-white rounded-2xl border border-slate-200/90 hover:border-[#00A86B]/60 shadow-[0_2px_8px_rgba(16,42,67,0.04)] hover:shadow-[0_8px_20px_rgba(16,42,67,0.08)] transition-all duration-200 flex flex-col justify-between overflow-hidden text-left h-full">
       <div>
-        {/* Profile Photograph Container */}
-        <div className="p-3.5 pb-0">
-          <div className="overflow-hidden rounded-2xl bg-slate-100 border border-[#E4E7EB]/80">
-            <AdvisorAvatar
-              name={name}
-              image={profileImage}
-              aspect="portrait"
-              className="w-full"
-              imgClassName="group-hover:scale-105"
-            />
+        {/* 1. Company logo or individual profile photo */}
+        <div className="p-3 pb-0">
+          <div className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50 h-36 sm:h-32">
+            <Link to={`/advisors/${slug}`} className="block w-full h-full">
+              <AdvisorAvatar
+                advisor={advisor}
+                aspect="compact"
+                className="w-full h-full transition-transform duration-300 group-hover:scale-102"
+              />
+            </Link>
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="p-5 sm:p-6 space-y-3.5">
-          {/* Category & Name */}
-          <div className="space-y-1">
-            <span className="block text-[11px] font-semibold text-[#0FA26E] tracking-wide">
-              {category}
-            </span>
+        {/* Card Content Body */}
+        <div className="p-4 pt-3 space-y-1.5">
+          {/* 2. Advisor or company name */}
+          <Link
+            to={`/advisors/${slug}`}
+            className="block text-base font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors font-display line-clamp-1 leading-snug"
+            title={name}
+          >
+            {name}
+          </Link>
 
-            <Link
-              to={`/advisors/${slug}`}
-              className="block text-lg sm:text-xl font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors font-display tracking-tight"
-            >
-              {name}
-            </Link>
-          </div>
-
-          {/* Short Description */}
-          <p className="text-xs text-[#172B3A]/75 font-normal leading-relaxed line-clamp-3">
-            {shortDescription}
+          {/* 3. Short designation */}
+          <p className="text-xs text-slate-500 font-medium line-clamp-1">
+            {designation || category}
           </p>
 
-          {/* Expertise Tags */}
-          {expertise && expertise.length > 0 && (
-            <div className="pt-1">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-[#627D98] mb-2">
-                Specialization
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {expertise.map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F0FDF4] text-[#0B6946] border border-[#00A86B]/20"
-                  >
-                    {tag}
-                  </span>
-                ))}
+          {/* 4. Star rating and review count */}
+          <div className="pt-0.5">
+            {ratingSummary.hasReviews ? (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#102A43]">
+                <span className="flex items-center text-amber-500 font-bold">
+                  <FiStar className="fill-amber-400 text-amber-400 text-xs mr-1" />
+                  {ratingSummary.ratingFormatted}
+                </span>
+                <span className="text-slate-400 text-[11px] font-normal">
+                  ({ratingSummary.totalReviews}{' '}
+                  {ratingSummary.totalReviews === 1 ? 'review' : 'reviews'})
+                </span>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                <FiStar className="text-slate-300 text-xs mr-0.5" />
+                <span>No reviews yet</span>
+              </div>
+            )}
+          </div>
+
+          {/* 5. Main insurance specialization */}
+          <p className="text-xs text-[#0FA26E] font-medium line-clamp-1 pt-0.5">
+            <span className="text-slate-400 font-normal">Specialization: </span>
+            {specialization || category}
+          </p>
         </div>
       </div>
 
-      {/* Card Action Footer */}
-      <div className="px-5 sm:px-6 py-3.5 bg-[#F8FAFC] border-t border-[#E4E7EB] flex items-center justify-between mt-auto">
-        <span className="text-[11px] font-medium text-[#627D98]">
-          WHYINSURED
-        </span>
+      {/* 6. Contact button & 7. View Profile link */}
+      <div className="p-3.5 pt-3 border-t border-slate-100 bg-[#FAFBFB] mt-auto flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleContact}
+          className="flex-1 py-2 px-3 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-semibold transition-all shadow-2xs hover:shadow cursor-pointer text-center"
+        >
+          Contact
+        </button>
 
         <Link
           to={`/advisors/${slug}`}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs"
+          className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-[#102A43] hover:text-[#00A86B] text-xs font-semibold transition-all shadow-2xs hover:border-[#00A86B]/40 text-center"
         >
-          <span>View Profile</span>
-          <FiArrowUpRight className="text-xs transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          View Profile
         </Link>
       </div>
     </article>
