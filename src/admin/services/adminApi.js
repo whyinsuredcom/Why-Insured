@@ -9,15 +9,39 @@ const PUBLIC_API = `${API_BASE_URL}/api/public`;
 const TOKEN_KEY = 'whyinsured_admin_token';
 const USER_KEY = 'whyinsured_admin_user';
 
-export const getToken = () => localStorage.getItem(TOKEN_KEY) || '';
+const safeGetLocal = (k) => {
+  try {
+    return (typeof window !== 'undefined' && window.localStorage) ? window.localStorage.getItem(k) : null;
+  } catch (_) {
+    return null;
+  }
+};
+
+const safeSetLocal = (k, v) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(k, v);
+    }
+  } catch (_) {}
+};
+
+const safeRemoveLocal = (k) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(k);
+    }
+  } catch (_) {}
+};
+
+export const getToken = () => safeGetLocal(TOKEN_KEY) || '';
 export const setToken = (token) => {
-  if (token) localStorage.setItem(TOKEN_KEY, token.trim());
-  else localStorage.removeItem(TOKEN_KEY);
+  if (token) safeSetLocal(TOKEN_KEY, token.trim());
+  else safeRemoveLocal(TOKEN_KEY);
 };
 
 export const getStoredUser = () => {
   try {
-    const raw = localStorage.getItem(USER_KEY);
+    const raw = safeGetLocal(USER_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch (e) {
     return null;
@@ -25,13 +49,13 @@ export const getStoredUser = () => {
 };
 
 export const setStoredUser = (user) => {
-  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
-  else localStorage.removeItem(USER_KEY);
+  if (user) safeSetLocal(USER_KEY, JSON.stringify(user));
+  else safeRemoveLocal(USER_KEY);
 };
 
 export const clearAuth = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  safeRemoveLocal(TOKEN_KEY);
+  safeRemoveLocal(USER_KEY);
 };
 
 export const getAuthHeaders = (isMultipart = false) => {
@@ -499,6 +523,62 @@ export const adminApi = {
   // Public APIs for preview & consumer pages
   async getPublicPlan(companySlug, planSlug) {
     const res = await fetch(`${PUBLIC_API}/plans/${companySlug}/${planSlug}`);
+    return handleResponse(res);
+  },
+
+  // Academy Management APIs
+  async getAcademyVideos() {
+    try {
+      const res = await fetch(`${PUBLIC_API}/academy/videos`);
+      return handleResponse(res);
+    } catch {
+      return { success: false, data: [] };
+    }
+  },
+  async createAcademyVideo(data) {
+    const res = await fetch(`${ADMIN_API}/academy/videos`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(res);
+  },
+  async updateAcademyVideo(id, data) {
+    const res = await fetch(`${ADMIN_API}/academy/videos/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(res);
+  },
+  async deleteAcademyVideo(id) {
+    const res = await fetch(`${ADMIN_API}/academy/videos/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return handleResponse(res);
+  },
+  async getAcademyArticles() {
+    try {
+      const res = await fetch(`${PUBLIC_API}/academy/articles`);
+      return handleResponse(res);
+    } catch {
+      return { success: false, data: [] };
+    }
+  },
+  async createAcademyArticle(data) {
+    const res = await fetch(`${ADMIN_API}/academy/articles`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(res);
+  },
+  async deleteAcademyArticle(id) {
+    const res = await fetch(`${ADMIN_API}/academy/articles/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
     return handleResponse(res);
   }
 };

@@ -7,13 +7,21 @@ export default function Preloader({ onComplete }) {
   const [startLoading, setStartLoading] = useState(false);
 
   useEffect(() => {
+    // Safety watchdog: ensure preloader unmounts even if backgrounded or throttled
+    const safetyTimer = setTimeout(() => {
+      if (onComplete) onComplete();
+    }, 1500);
+
     // Stage 1: Logo fades in first. Trigger progress loading after 200ms.
     const startTimer = setTimeout(() => {
       setStartLoading(true);
     }, 200);
 
-    return () => clearTimeout(startTimer);
-  }, []);
+    return () => {
+      clearTimeout(safetyTimer);
+      clearTimeout(startTimer);
+    };
+  }, [onComplete]);
 
   useEffect(() => {
     if (!startLoading) return;

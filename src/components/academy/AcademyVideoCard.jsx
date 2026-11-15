@@ -1,210 +1,252 @@
-import React, { useState } from 'react';
-import { FiPlay, FiClock, FiCheck, FiInfo, FiX, FiExternalLink } from 'react-icons/fi';
-import { SiYoutube } from 'react-icons/si';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  FiPlay,
+  FiClock,
+  FiMoreVertical,
+  FiBookmark,
+  FiShare2,
+  FiCheck,
+  FiCheckCircle
+} from 'react-icons/fi';
+import {
+  isWatchLater,
+  toggleWatchLater,
+  getWatchHistory,
+  subscribeToAcademyStorage
+} from '../../services/academyStorageService';
 
-/**
- * YouTube-style Academy Video Card
- * - Supports long videos and short videos
- * - Compact, rounded card with subtle borders
- * - Includes thumbnail, video title, and duration badge
- * - Ready for embedding YouTube videos later without inventing fake links or dummy video embeds
- */
-export default function AcademyVideoCard({ video }) {
-  const [showNoticeModal, setShowNoticeModal] = useState(false);
+export default function AcademyVideoCard({ video, showProgress = true }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [inWatchLater, setInWatchLater] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [watchProgress, setWatchProgress] = useState(0);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!video?.id) return;
+    setInWatchLater(isWatchLater(video.id));
+
+    // Check watch progress
+    const history = getWatchHistory();
+    const item = history.find((h) => h.videoId === video.id);
+    if (item && item.progressPercent) {
+      setWatchProgress(item.progressPercent);
+    }
+
+    const unsubscribe = subscribeToAcademyStorage(() => {
+      setInWatchLater(isWatchLater(video.id));
+      const updatedHistory = getWatchHistory();
+      const updatedItem = updatedHistory.find((h) => h.videoId === video.id);
+      if (updatedItem && updatedItem.progressPercent) {
+        setWatchProgress(updatedItem.progressPercent);
+      }
+    });
+
+    return unsubscribe;
+  }, [video?.id]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (!video) return null;
 
   const isShort = video.type === 'short';
-  const hasYoutube = Boolean(video.youtubeId);
+  const watchUrl = `/insurance-academy/watch/${video.id}`;
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    if (hasYoutube) {
-      window.open(`https://www.youtube.com/watch?v=${video.youtubeId}`, '_blank', 'noopener,noreferrer');
-    } else {
-      setShowNoticeModal(true);
+  const handleCardClick = (e) => {
+    // If clicking menu, don't navigate
+    if (e.target.closest('.menu-trigger') || e.target.closest('.menu-dropdown')) {
+      return;
+    }
+    navigate(watchUrl);
+  };
+
+  const handleWatchLaterClick = (e) => {
+    e.stopPropagation();
+    const state = toggleWatchLater(video);
+    setInWatchLater(state);
+    setMenuOpen(false);
+  };
+
+  const handleShareClick = (e) => {
+    e.stopPropagation();
+    const fullUrl = `${window.location.origin}/insurance-academy/watch/${video.id}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+          setMenuOpen(false);
+        }, 1500);
+      });
     }
   };
 
   return (
-    <>
-      <article
-        onClick={handleClick}
-        className="group bg-white rounded-2xl border border-slate-200/90 hover:border-[#00A86B]/60 shadow-[0_2px_8px_rgba(16,42,67,0.04)] hover:shadow-[0_8px_20px_rgba(16,42,67,0.08)] transition-all duration-200 flex flex-col justify-between overflow-hidden text-left cursor-pointer select-none h-full"
-      >
-        <div>
-          {/* =========================================================================
-              THUMBNAIL CONTAINER (YouTube 16:9 Aspect Ratio)
-          ========================================================================= */}
-          <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-[#102A43] via-[#163654] to-[#0A192F] border-b border-slate-100 flex items-center justify-center">
-            {video.thumbnail ? (
-              <img
-                src={video.thumbnail}
-                alt={video.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            ) : (
-              /* Clean, Authentic WHYINSURED Video Poster Placeholder (No dummy stock photos) */
-              <div className="w-full h-full p-3.5 flex flex-col justify-between relative">
-                {/* Subtle Radial Mesh Accent */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#00A86B_0%,transparent_60%)] opacity-20 pointer-events-none" />
+    <article
+      onClick={handleCardClick}
+      className="group flex flex-col rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer select-none text-left h-full"
+    >
+      {/* =====================================================================
+          THUMBNAIL CONTAINER (16:9 Aspect Ratio)
+      ===================================================================== */}
+      <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-[#0C1E38] via-[#102A43] to-[#0A192F] flex items-center justify-center shrink-0">
+        {video.thumbnail ? (
+          <img
+            src={video.thumbnail}
+            alt={video.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        ) : (
+          /* Authentic WHYINSURED Video Poster Placeholder */
+          <div className="w-full h-full p-3.5 flex flex-col justify-between relative">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#00A86B_0%,transparent_60%)] opacity-25 pointer-events-none" />
 
-                {/* Top Row: Category Tag & Format Badge */}
-                <div className="flex items-center justify-between z-10">
-                  <span className="text-[10px] font-bold text-white bg-white/10 backdrop-blur-xs px-2 py-0.5 rounded border border-white/15 tracking-wide">
-                    {video.category}
-                  </span>
+            {/* Top Row: Category Pill */}
+            <div className="flex items-center justify-between z-10">
+              <span className="text-[10px] font-bold text-white bg-white/10 backdrop-blur-xs px-2 py-0.5 rounded border border-white/15">
+                {video.category}
+              </span>
+              <span className="text-[9px] font-bold text-emerald-300 uppercase tracking-widest bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                WHYINSURED
+              </span>
+            </div>
 
-                  {isShort ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-white bg-red-600 px-1.5 py-0.5 rounded shadow-xs tracking-wider">
-                      <span className="text-[9px]">▶</span>
-                      <span>Shorts</span>
-                    </span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-emerald-300 uppercase tracking-widest bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                      Academy
-                    </span>
-                  )}
-                </div>
-
-                {/* Center: Play Button */}
-                <div className="flex items-center justify-center my-auto z-10">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/15 backdrop-blur-xs border border-white/25 text-white flex items-center justify-center group-hover:bg-[#00A86B] group-hover:scale-110 group-hover:border-transparent transition-all duration-200 shadow-md">
-                    <FiPlay className="text-sm sm:text-base ml-0.5" />
-                  </div>
-                </div>
-
-                {/* Topic Hint on Bottom Left */}
-                <div className="z-10 truncate pr-16">
-                  <span className="text-[10px] font-medium text-slate-300 truncate block">
-                    {video.topic}
-                  </span>
-                </div>
+            {/* Center: Play Circle */}
+            <div className="flex items-center justify-center my-auto z-10">
+              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-xs border border-white/30 text-white flex items-center justify-center group-hover:bg-[#00A86B] group-hover:scale-110 group-hover:border-transparent transition-all duration-200 shadow-lg">
+                <FiPlay className="text-sm ml-0.5" />
               </div>
-            )}
+            </div>
 
-            {/* Duration Badge - YouTube Style in Bottom-Right Corner */}
-            <div className="absolute bottom-2 right-2 z-20">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/85 text-white text-[11px] font-semibold tracking-tight shadow-xs">
-                {isShort ? (
-                  <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                    <span>{video.duration || 'Short'}</span>
-                  </>
-                ) : (
-                  <>
-                    <FiClock className="text-[10px] text-slate-300" />
-                    <span>{video.duration || 'Upcoming'}</span>
-                  </>
-                )}
+            {/* Bottom Topic Hint */}
+            <div className="z-10 truncate pr-14">
+              <span className="text-[10px] font-medium text-slate-300 truncate block">
+                {video.topic || 'Insurance Guide'}
               </span>
             </div>
           </div>
+        )}
 
-          {/* =========================================================================
-              VIDEO INFORMATION AREA
-          ========================================================================= */}
-          <div className="p-3.5 space-y-2">
-            {/* Title */}
-            <h3 className="text-xs sm:text-sm font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors line-clamp-2 leading-snug">
-              {video.title}
-            </h3>
-
-            {/* Description (Brief) */}
-            {video.description && (
-              <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                {video.description}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* =========================================================================
-            CARD FOOTER: Category & Video Format Pill
-        ========================================================================= */}
-        <div className="px-3.5 pb-3.5 pt-1 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-100">
-          <span className="font-medium text-slate-500">
-            {video.category}
-          </span>
-
-          <span className="inline-flex items-center gap-1 text-slate-600 font-semibold group-hover:text-[#00A86B] transition-colors">
-            {hasYoutube ? (
+        {/* Duration Badge - YouTube Style in Bottom-Right Corner */}
+        <div className="absolute bottom-2 right-2 z-20">
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/85 text-white text-[11px] font-semibold tracking-tight shadow-xs">
+            {isShort ? (
               <>
-                <SiYoutube className="text-red-600 text-xs" />
-                <span>Watch Video</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                <span>{video.duration || 'Short'}</span>
               </>
             ) : (
               <>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00A86B]" />
-                <span>{isShort ? 'Short Video' : 'Full Guide'}</span>
+                <FiClock className="text-[10px] text-slate-300" />
+                <span>{video.duration || 'Upcoming'}</span>
               </>
             )}
           </span>
         </div>
-      </article>
 
-      {/* =========================================================================
-          INFO MODAL: Ready for adding YouTube videos later without dummy embeds
-      ========================================================================= */}
-      {showNoticeModal && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-2xs"
-          onClick={() => setShowNoticeModal(false)}
-        >
-          <div
-            className="bg-white rounded-2xl max-w-sm w-full p-5 border border-slate-200 shadow-xl space-y-3.5 text-left relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setShowNoticeModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
-            >
-              <FiX className="text-sm" />
-            </button>
+        {/* Watch Progress Red Line (if partially watched) */}
+        {showProgress && watchProgress > 0 && (
+          <div className="absolute bottom-0 inset-x-0 h-1 bg-white/30 z-20 overflow-hidden">
+            <div
+              className="h-full bg-red-600 transition-all duration-300"
+              style={{ width: `${watchProgress}%` }}
+            />
+          </div>
+        )}
+      </div>
 
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#00A86B] border border-emerald-100 flex items-center justify-center shrink-0">
-                <FiInfo className="text-lg" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-[#102A43]">
-                  WHYINSURED Insurance Academy
-                </h4>
-                <span className="text-[10px] text-slate-400">
-                  {video.category} • {isShort ? 'Short Video' : 'Video Guide'}
-                </span>
-              </div>
-            </div>
+      {/* =====================================================================
+          METADATA ROW: AVATAR, TITLE, CHANNEL, & 3-DOT MENU
+      ===================================================================== */}
+      <div className="p-3.5 flex items-start gap-3 flex-1 min-w-0">
+        {/* Channel / Desk Avatar */}
+        <div className="w-8 h-8 rounded-full bg-[#102A43] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs mt-0.5">
+          WI
+        </div>
 
-            <div className="space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-200/70">
-              <h5 className="text-xs font-bold text-[#102A43]">
-                {video.title}
-              </h5>
-              <p className="text-[11px] text-slate-500 leading-relaxed">
-                {video.description}
-              </p>
-            </div>
+        {/* Details Column */}
+        <div className="flex-1 min-w-0 space-y-1">
+          <h3 className="text-xs sm:text-sm font-bold text-[#102A43] group-hover:text-[#00A86B] line-clamp-2 leading-snug transition-colors">
+            {video.title}
+          </h3>
 
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              This learning video is currently in production for the WHYINSURED official YouTube channel. The player will be linked here once published.
-            </p>
-
-            <div className="pt-1 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={() => setShowNoticeModal(false)}
-                className="px-4 py-1.5 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Got It
-              </button>
-            </div>
+          <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5 font-medium leading-none">
+            <span className="text-slate-700 font-semibold truncate max-w-[130px]">
+              {video.instructor || 'WHYINSURED Desk'}
+            </span>
+            <span className="text-slate-300">•</span>
+            <span>{video.views || '12K views'}</span>
+            <span className="text-slate-300">•</span>
+            <span>{video.uploadDate || 'Recently'}</span>
           </div>
         </div>
-      )}
-    </>
+
+        {/* 3-Dot Action Menu */}
+        <div ref={menuRef} className="relative shrink-0 -mr-1">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuOpen(!menuOpen);
+            }}
+            className="menu-trigger p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Options"
+          >
+            <FiMoreVertical className="text-sm" />
+          </button>
+
+          {menuOpen && (
+            <div className="menu-dropdown absolute right-0 top-full mt-1 w-44 bg-white rounded-xl border border-slate-200 shadow-xl py-1 z-30 text-xs">
+              <button
+                type="button"
+                onClick={handleWatchLaterClick}
+                className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-2 text-slate-700 hover:text-[#00A86B] transition-colors cursor-pointer font-medium"
+              >
+                {inWatchLater ? (
+                  <>
+                    <FiCheck className="text-emerald-600 text-sm" />
+                    <span>In Watch Later</span>
+                  </>
+                ) : (
+                  <>
+                    <FiBookmark className="text-slate-400 text-sm" />
+                    <span>Save to Watch Later</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareClick}
+                className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-2 text-slate-700 hover:text-[#00A86B] transition-colors cursor-pointer font-medium"
+              >
+                {copied ? (
+                  <>
+                    <FiCheckCircle className="text-emerald-600 text-sm" />
+                    <span className="text-emerald-700 font-semibold">Link Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <FiShare2 className="text-slate-400 text-sm" />
+                    <span>Share Video Link</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </article>
   );
 }
-

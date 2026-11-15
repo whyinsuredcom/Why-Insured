@@ -4,6 +4,7 @@ import {
   FiGrid,
   FiBriefcase,
   FiLayers,
+  FiVideo,
   FiSettings,
   FiLogOut,
   FiExternalLink,
@@ -32,6 +33,7 @@ export default function AdminLayout() {
     { label: 'Dashboard', path: '/admin/dashboard', icon: FiGrid },
     { label: 'Companies', path: '/admin/companies', icon: FiBriefcase },
     { label: 'Plans', path: '/admin/plans', icon: FiLayers },
+    { label: 'Academy', path: '/admin/academy', icon: FiVideo },
     { label: 'Settings', path: '/admin/settings', icon: FiSettings }
   ];
 

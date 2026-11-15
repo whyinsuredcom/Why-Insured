@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Component } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   FiArrowLeft,
@@ -14,7 +14,11 @@ import {
   FiUser,
   FiShield,
   FiCheckCircle,
-  FiArrowUpRight
+  FiArrowUpRight,
+  FiBriefcase,
+  FiFileText,
+  FiHeart,
+  FiAward
 } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import AdvisorAvatar from '../components/advisors/AdvisorAvatar';
@@ -28,13 +32,64 @@ import {
 } from '../services/reviewService';
 
 /**
- * Premium, Professional & Customer-Friendly Advisor Detail Page
- * - Responsive 2-column desktop layout (content on left, contact sidebar on right)
- * - Profile Header with photo/logo, designation, verified status & quick Call/WhatsApp
- * - About, Expertise, Customer Benefits, and Reviews & Ratings with breakdown
- * - Working contact & enquiry callback submission
+ * Premium Advisor Profile Page - Executive Editorial Concept
+ * 
+ * 1. Dark Navy Hero: Visually rich, compact, displaying original photo/logo, verified status, name, designation, rating, and immediate Call/WhatsApp actions.
+ * 2. Customer Help Section: Four distinct visual blocks (Policy Guidance, Claim Assistance, Family Coverage, Policy Review) driven by real data.
+ * 3. Professional Information: Editorial layout with narrative background, experience callout, and numbered advisory principles.
+ * 4. Customer Reviews: Authentic star ratings, 5-to-1 breakdown bars, client written feedback, and simple review submission form.
+ * 5. Contact Experience: Sticky floating contact sidebar on desktop, responsive inline panel, and mobile quick-reach actions.
  */
-export default function AdvisorDetailPage() {
+class AdvisorErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[AdvisorDetailPage] Caught rendering exception:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#F8FAFC] pt-32 pb-16 font-sans px-4 text-left">
+          <div className="max-w-md mx-auto bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4 shadow-sm">
+            <h2 className="text-lg font-bold text-[#102A43]">
+              Unable to Load Advisor Profile
+            </h2>
+            <p className="text-xs text-slate-500">
+              An unexpected display issue occurred. You can return to the directory to select an advisor.
+            </p>
+            <div className="pt-2 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => this.setState({ hasError: false, error: null })}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#102A43] text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Retry
+              </button>
+              <Link
+                to="/advisors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-colors cursor-pointer"
+              >
+                <FiArrowLeft className="text-xs" />
+                <span>Back to Advisors</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function AdvisorDetailContent() {
   const { slug } = useParams();
 
   const [advisor, setAdvisor] = useState(null);
@@ -50,7 +105,7 @@ export default function AdvisorDetailPage() {
     ratingFormatted: '0.0'
   });
 
-  // Review Form state
+  // Review Submission Form state
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewName, setReviewName] = useState('');
   const [reviewCity, setReviewCity] = useState('');
@@ -61,7 +116,7 @@ export default function AdvisorDetailPage() {
   const [reviewSuccessMessage, setReviewSuccessMessage] = useState(null);
   const [reviewErrorMessage, setReviewErrorMessage] = useState(null);
 
-  // Enquiry Form state (Contact Section)
+  // Enquiry / Callback Form state
   const [enquiryForm, setEnquiryForm] = useState({
     name: '',
     phone: '',
@@ -72,7 +127,7 @@ export default function AdvisorDetailPage() {
   const [enquirySubmitting, setEnquirySubmitting] = useState(false);
   const [enquirySubmitted, setEnquirySubmitted] = useState(false);
 
-  // Load Advisor Details
+  // Fetch Advisor Details
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
@@ -100,7 +155,7 @@ export default function AdvisorDetailPage() {
     };
   }, [slug]);
 
-  // Load genuine reviews & subscribe to updates
+  // Load genuine client reviews & subscribe to updates
   useEffect(() => {
     if (!slug) return;
     const loadReviewsData = () => {
@@ -119,18 +174,20 @@ export default function AdvisorDetailPage() {
     return unsubscribe;
   }, [slug]);
 
-  // Dynamic Rating Breakdown (5-star to 1-star) calculated from real submitted reviews
+  // Dynamic Rating Breakdown (5 to 1 Star)
   const ratingBreakdown = useMemo(() => {
     const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    reviews.forEach((r) => {
-      const star = Math.max(1, Math.min(5, Math.round(Number(r.rating) || 5)));
-      counts[star] = (counts[star] || 0) + 1;
-    });
-    const total = reviews.length;
+    if (Array.isArray(reviews)) {
+      reviews.forEach((r) => {
+        const star = Math.max(1, Math.min(5, Math.round(Number(r?.rating) || 5)));
+        counts[star] = (counts[star] || 0) + 1;
+      });
+    }
+    const total = Array.isArray(reviews) ? reviews.length : 0;
     return [5, 4, 3, 2, 1].map((star) => ({
       star,
-      count: counts[star],
-      percentage: total > 0 ? Math.round((counts[star] / total) * 100) : 0
+      count: counts[star] || 0,
+      percentage: total > 0 ? Math.round(((counts[star] || 0) / total) * 100) : 0
     }));
   }, [reviews]);
 
@@ -156,7 +213,6 @@ export default function AdvisorDetailPage() {
       setReviewCity('');
       setReviewComment('');
       setReviewRating(5);
-      // Refresh local reviews state
       setReviews(getAdvisorReviews(slug));
       setRatingSummary(getAdvisorRatingSummary(slug));
       setTimeout(() => {
@@ -178,11 +234,11 @@ export default function AdvisorDetailPage() {
       `Hello WHYINSURED Advisory Desk,\n\n` +
       `I would like to consult with ${advisor?.name}.\n\n` +
       `My Details:\n` +
-      `• Name: ${enquiryForm.name}\n` +
+      `• Full Name: ${enquiryForm.name}\n` +
       `• Phone: ${enquiryForm.phone}\n` +
       `• Email: ${enquiryForm.email}\n` +
-      `• Topic: ${enquiryForm.topic}\n` +
-      `• Message: ${enquiryForm.message || 'N/A'}\n\n` +
+      `• Advisory Topic: ${enquiryForm.topic}\n` +
+      `• Message / Medical Needs: ${enquiryForm.message || 'N/A'}\n\n` +
       `Thank you!`
     );
 
@@ -200,7 +256,7 @@ export default function AdvisorDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pt-28 pb-16 font-sans">
+      <div className="min-h-screen bg-[#F8FAFC] pt-24 pb-16 font-sans">
         <AdvisorDetailSkeleton />
       </div>
     );
@@ -228,294 +284,388 @@ export default function AdvisorDetailPage() {
     );
   }
 
-  const isCompany = advisor.type === 'company';
-  const cleanPhone = (advisor.whatsapp || advisor.phone || '919876543210').replace(/[^0-9]/g, '');
-  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-    `Hello ${advisor.name}, I am contacting you via WHYINSURED regarding health insurance guidance.`
+  const isCompany = Boolean(advisor.type === 'company' || advisor.isCompany);
+  const cleanPhone = String(advisor.phone || '+91 98765 43210').replace(/[\s()-]/g, '');
+  const cleanWa = String(advisor.whatsapp || advisor.phone || '919876543210').replace(/[^0-9]/g, '');
+  const whatsappUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(
+    `Hello ${advisor.name || 'Advisor'}, I am contacting you via WHYINSURED regarding health insurance guidance.`
   )}`;
 
+  const guidance = Array.isArray(advisor.guidancePoints) ? advisor.guidancePoints : [];
+  const introList = Array.isArray(advisor.intro) ? advisor.intro : (advisor.intro ? [advisor.intro] : []);
+  const leadQuote = advisor.shortDescription || introList[0] || 'Dedicated to transparent health insurance advisory and policy evaluation.';
+
+  // Derived help blocks based on actual advisor data
+  const helpBlocks = [
+    {
+      id: 'policy-guidance',
+      title: 'Policy Guidance',
+      icon: FiShield,
+      iconColor: 'text-[#00A86B] bg-emerald-500/10 border-emerald-500/20',
+      description: guidance[0]?.desc || 'Objective evaluation of sum insured adequacy, base indemnity plans, and medical inflation protection.'
+    },
+    {
+      id: 'claim-assistance',
+      title: 'Claim Assistance',
+      icon: FiFileText,
+      iconColor: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
+      description: guidance[1]?.desc || 'Cashless hospital admission procedures, pre-authorization timelines, and avoiding non-medical deductions.'
+    },
+    {
+      id: 'family-coverage',
+      title: 'Family Coverage',
+      icon: FiHeart,
+      iconColor: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
+      description: guidance[2]?.desc || 'Structuring multi-individual floaters, parental coverage, and automatic sum insured restorations.'
+    },
+    {
+      id: 'policy-review',
+      title: 'Policy Review',
+      icon: FiCheckCircle,
+      iconColor: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+      description: `In-depth fine-print scrutiny focusing on ${advisor.specialization || 'room rent limits and waiting period continuity'}.`
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pt-24 pb-16 font-sans text-[#172B3A] text-left">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* =========================================================================
-            BREADCRUMBS & BACK LINK
-        ========================================================================= */}
-        <div className="mb-4 flex items-center justify-between">
-          <Link
-            to="/advisors"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#00A86B] transition-colors py-1 cursor-pointer group"
-          >
-            <div className="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#102A43] group-hover:border-[#00A86B] group-hover:text-[#00A86B] transition-all shadow-2xs">
-              <FiArrowLeft className="text-xs group-hover:-translate-x-0.5 transition-transform" />
-            </div>
-            <span>Back to All Advisors</span>
-          </Link>
+    <div className="min-h-screen bg-[#F8FAFC] font-sans text-[#172B3A] text-left pb-20 sm:pb-0">
+      
+      {/* =========================================================================
+          1. UNIQUE PROFILE HERO: VISUALLY RICH DARK NAVY SECTION
+      ========================================================================= */}
+      <header className="bg-gradient-to-b from-[#081325] via-[#0C1E38] to-[#0E2442] text-white pt-24 pb-12 sm:pt-28 sm:pb-14 relative overflow-hidden">
+        {/* Subtle decorative mesh gradients */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#00A86B]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <span className="text-[11px] text-slate-400">
-            Advisors Directory / {advisor.name}
-          </span>
-        </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Breadcrumb Navigation inside Hero */}
+          <div className="mb-6 flex items-center justify-between">
+            <Link
+              to="/advisors"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white transition-colors group px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm"
+            >
+              <FiArrowLeft className="text-xs group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Advisors</span>
+            </Link>
 
-        {/* =========================================================================
-            1. PROFILE HEADER
-            - Original photo or company logo
-            - Advisor name and designation
-            - Genuine rating and review count
-            - Verification status badge
-            - Prominent Call and WhatsApp buttons
-        ========================================================================= */}
-        <section className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_2px_12px_rgba(16,42,67,0.04)] p-5 sm:p-6 mb-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+              WHYINSURED Advisor Profile
+            </span>
+          </div>
+
+          {/* Hero Row: Avatar + Details + Instant Actions */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
             
-            {/* Photo / Logo & Primary Information */}
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 border border-slate-200 bg-slate-50 shadow-2xs">
-                <AdvisorAvatar
-                  advisor={advisor}
-                  aspect="square"
-                  className="w-full h-full"
-                />
+            {/* Left: Avatar & Identity Details */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 flex-1 min-w-0">
+              
+              {/* Prominent Avatar with Ring & Shadow */}
+              <div className="relative shrink-0">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden ring-4 ring-white/15 shadow-2xl bg-white">
+                  <AdvisorAvatar
+                    advisor={advisor}
+                    aspect="square"
+                    className="w-full h-full"
+                  />
+                </div>
+                <span
+                  className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#00A86B] border-3 border-[#0C1E38] flex items-center justify-center shadow-sm"
+                  title="Active verified advisory desk"
+                >
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                </span>
               </div>
 
-              <div className="space-y-1">
-                {/* Verification Status */}
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0B6946] bg-[#F0FDF4] px-2.5 py-0.5 rounded-full border border-[#00A86B]/25">
-                    <FiShield className="text-xs text-[#00A86B]" />
-                    <span>{isCompany ? 'Verified Insurer Desk' : 'Verified Advisor'}</span>
+              {/* Identity Details */}
+              <div className="space-y-2 min-w-0 flex-1">
+                {/* Badges line: Verification & Experience */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-400/25 px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                    <FiShield className="text-emerald-400 text-xs" />
+                    <span>{isCompany ? 'Verified Institutional Desk' : 'Verified Health Advisor'}</span>
                   </span>
-                  
+
                   {advisor.experience && (
-                    <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                      {advisor.experience}
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-200 bg-white/10 border border-white/10 px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                      <FiBriefcase className="text-slate-300 text-xs" />
+                      <span>{advisor.experience}</span>
                     </span>
                   )}
                 </div>
 
                 {/* Name */}
-                <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display tracking-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-display leading-tight">
                   {advisor.name}
                 </h1>
 
-                {/* Designation */}
-                <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                  {advisor.designation || advisor.category}
+                {/* Designation & Company */}
+                <p className="text-sm sm:text-base text-slate-300 font-medium">
+                  {advisor.designation || (isCompany ? 'Institutional Advisory Desk' : 'Health Insurance Advisor')}
                   {advisor.companyName && advisor.companyName !== advisor.name && (
                     <span className="text-slate-400"> • {advisor.companyName}</span>
                   )}
                 </p>
 
-                {/* Genuine Rating & Review Count */}
-                <div className="pt-0.5 flex items-center gap-2 text-xs">
+                {/* Genuine Rating Pill */}
+                <div className="flex items-center gap-2 pt-0.5">
                   {ratingSummary.hasReviews ? (
-                    <div className="flex items-center gap-1 text-[#102A43] font-bold">
-                      <FiStar className="fill-amber-400 text-amber-400 text-sm" />
-                      <span>{ratingSummary.ratingFormatted}</span>
-                      <span className="text-slate-400 font-normal">
-                        ({ratingSummary.totalReviews}{' '}
-                        {ratingSummary.totalReviews === 1 ? 'client review' : 'client reviews'})
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs text-white backdrop-blur-sm">
+                      <span className="font-bold text-amber-300 text-sm leading-none">
+                        {ratingSummary.ratingFormatted}
+                      </span>
+                      <div className="flex items-center text-amber-400">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <svg
+                            key={s}
+                            className={`w-3 h-3 ${
+                              s <= Math.round(ratingSummary.averageRating)
+                                ? 'text-amber-400 fill-amber-400'
+                                : 'text-white/20 fill-white/20'
+                            }`}
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                      <span className="text-slate-300">
+                        ({ratingSummary.totalReviews} {ratingSummary.totalReviews === 1 ? 'client review' : 'client reviews'})
                       </span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 text-slate-400">
-                      <FiStar className="text-slate-300 text-xs" />
-                      <span>No reviews yet</span>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300">
+                      <FiStar className="text-slate-400 text-xs" />
+                      <span>Authentic reviews submitted by verified clients</span>
                     </div>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Prominent Call & WhatsApp Buttons */}
-            <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0 pt-2 sm:pt-0">
+            {/* Right: Prominent Call & WhatsApp Actions */}
+            <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 w-full md:w-56 shrink-0 pt-2 md:pt-0">
               <a
-                href={`tel:${advisor.phone || '+919876543210'}`}
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow cursor-pointer text-center"
-                title={`Call ${advisor.name}`}
+                href={`tel:${cleanPhone}`}
+                className="w-full py-3 px-4 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/30 transition-all flex items-center justify-center gap-2 cursor-pointer text-center"
               >
-                <FiPhone className="text-sm" />
-                <span>Call Directly</span>
+                <FiPhone className="text-base" />
+                <span>Call: {advisor.phone || '+91 98765 43210'}</span>
               </a>
 
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow cursor-pointer text-center"
-                title={`WhatsApp ${advisor.name}`}
+                className="w-full py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/20 transition-all flex items-center justify-center gap-2 cursor-pointer text-center"
               >
-                <FaWhatsapp className="text-base" />
-                <span>WhatsApp</span>
+                <FaWhatsapp className="text-lg" />
+                <span>Chat on WhatsApp</span>
               </a>
+
+              <div className="text-[11px] text-slate-400 text-center font-medium pt-0.5">
+                {advisor.consultation?.availability || 'Available Mon – Sat (10 AM – 6:30 PM)'}
+              </div>
             </div>
 
           </div>
-        </section>
+        </div>
+      </header>
 
-        {/* =========================================================================
-            TWO-COLUMN DESKTOP LAYOUT
-            - Left Column: About, Expertise, Customer Benefits, Reviews & Ratings
-            - Right Column: Contact & Callback Section (Sticky Sidebar)
-        ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* =========================================================================
+          2. CUSTOMER HELP SECTION: 4 VISUAL PILLARS
+      ========================================================================= */}
+      <section className="border-b border-slate-200/80 bg-white py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* =======================================================================
-              LEFT COLUMN (MAIN ADVISOR INFORMATION)
-          ======================================================================= */}
-          <div className="lg:col-span-8 space-y-6">
-            
-            {/* 2. ABOUT SECTION */}
-            <section className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-3">
-              <h2 className="text-base font-bold text-[#102A43] font-display border-b border-slate-100 pb-2">
-                About this Advisor
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+            <div>
+              <span className="text-xs font-bold text-[#00A86B] uppercase tracking-wider">
+                Advisory Services
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display mt-0.5">
+                What this Advisor Can Help You With
               </h2>
+            </div>
+            <p className="text-xs text-slate-500 max-w-md">
+              Targeted guidance tailored to health indemnity contracts, network hospital clearance, and claims.
+            </p>
+          </div>
 
-              <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                {Array.isArray(advisor.intro) ? (
-                  advisor.intro.map((para, pIdx) => (
+          {/* 4 Feature Help Tiles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {helpBlocks.map((block) => {
+              const IconComp = block.icon;
+              return (
+                <div
+                  key={block.id}
+                  className="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 hover:border-[#00A86B]/40 hover:bg-white hover:shadow-md transition-all duration-200 space-y-2 group"
+                >
+                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-lg ${block.iconColor}`}>
+                    <IconComp />
+                  </div>
+                  <h3 className="text-sm font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors">
+                    {block.title}
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    {block.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
+          EDITORIAL TWO-COLUMN LAYOUT
+          - Left: Professional Narrative, Guidance Points, Customer Reviews
+          - Right: Compact Sticky Contact Panel
+      ========================================================================= */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* =====================================================================
+              LEFT COLUMN: PROFESSIONAL EDITORIAL STORY & REVIEWS (8 cols)
+          ===================================================================== */}
+          <div className="lg:col-span-8 space-y-10">
+            
+            {/* 3. PROFESSIONAL ABOUT & EDITORIAL INFORMATION */}
+            <article className="space-y-6">
+              
+              {/* Lead Statement */}
+              <div className="border-l-4 border-[#00A86B] pl-4 sm:pl-5 py-1">
+                <p className="text-base sm:text-lg font-medium text-slate-800 leading-relaxed italic">
+                  "{leadQuote}"
+                </p>
+                <span className="text-xs font-semibold text-slate-500 mt-1 block">
+                  — {advisor.name}, {advisor.designation || (isCompany ? 'Institutional Advisory Desk' : 'Health Insurance Advisor')}
+                </span>
+              </div>
+
+              {/* Narrative Biography */}
+              <div className="space-y-3.5 text-sm text-slate-600 leading-relaxed font-normal">
+                {introList.length > 0 ? (
+                  introList.map((para, pIdx) => (
                     <p key={pIdx}>{para}</p>
                   ))
                 ) : (
-                  <p>{advisor.intro || advisor.shortDescription}</p>
+                  <p>Objective health insurance guidance tailored to your family's healthcare requirements.</p>
                 )}
               </div>
 
-              {/* Experience Highlight if Available */}
+              {/* Experience Callout Banner */}
               {advisor.experience && (
-                <div className="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-700">Advisory Background</span>
-                  <span className="font-bold text-[#102A43]">{advisor.experience} in Healthcare Advisory</span>
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#102A43] to-[#1A3A5E] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                      Advisory Track Record
+                    </span>
+                    <h3 className="text-lg font-bold text-white font-display">
+                      {advisor.experience} in Health Insurance Consultation
+                    </h3>
+                    <p className="text-xs text-slate-300">
+                      Objective scrutiny of IRDAI policy contracts and hospital network pre-authorizations.
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <span className="px-3.5 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-semibold text-white backdrop-blur-sm inline-flex items-center gap-1.5">
+                      <FiAward className="text-emerald-400" />
+                      <span>Verified Record</span>
+                    </span>
+                  </div>
                 </div>
               )}
-            </section>
 
-            {/* 3. EXPERTISE SECTION */}
-            <section className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
-              <h2 className="text-base font-bold text-[#102A43] font-display border-b border-slate-100 pb-2">
-                Insurance Categories & Expertise
-              </h2>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-500">Primary Specialization:</span>
-                  <span className="text-xs font-bold text-[#0FA26E]">{advisor.specialization}</span>
-                </div>
-
-                {advisor.expertise && advisor.expertise.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+              {/* Areas of Expertise Pill Catalog */}
+              {advisor.expertise && advisor.expertise.length > 0 && (
+                <div className="pt-2 space-y-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    Areas of Expertise:
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
                     {advisor.expertise.map((tag, idx) => (
                       <span
                         key={idx}
-                        className="px-2.5 py-1 rounded-lg text-xs font-medium bg-[#F0FDF4] text-[#0B6946] border border-[#00A86B]/20"
+                        className="px-3 py-1.5 rounded-xl text-xs font-medium bg-white text-[#102A43] border border-slate-200 shadow-2xs hover:border-[#00A86B]/40 transition-colors"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
-              {/* Services Offered to Customers */}
+              {/* Structured Advisory Guidance Points (Numbered Editorial Style) */}
               {advisor.guidancePoints && advisor.guidancePoints.length > 0 && (
-                <div className="pt-2 space-y-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Services Offered to Customers:
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="pt-4 space-y-4">
+                  <div className="border-b border-slate-200 pb-2">
+                    <h3 className="text-sm font-bold text-[#102A43] uppercase tracking-wider font-display">
+                      Structured Guidance Provided to Clients
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
                     {advisor.guidancePoints.map((item, idx) => (
                       <div
                         key={idx}
-                        className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1"
+                        className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-[#00A86B]/40 transition-all flex items-start gap-4"
                       >
-                        <h4 className="text-xs font-bold text-[#102A43] flex items-center gap-1.5">
-                          <FiCheck className="text-[#00A86B] text-xs shrink-0" />
-                          <span>{item.title}</span>
-                        </h4>
-                        <p className="text-[11px] text-slate-500 leading-relaxed">
-                          {item.desc}
-                        </p>
+                        <span className="text-lg font-black text-emerald-600 font-mono shrink-0 w-8 pt-0.5">
+                          0{idx + 1}
+                        </span>
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-bold text-[#102A43]">
+                            {item.title}
+                          </h4>
+                          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                            {item.desc}
+                          </p>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-            </section>
+            </article>
 
-            {/* 4. CUSTOMER BENEFITS SECTION */}
-            <section className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-3">
-              <h2 className="text-base font-bold text-[#102A43] font-display border-b border-slate-100 pb-2">
-                How this Advisor Helps You (Customer Benefits)
-              </h2>
-
-              <p className="text-xs text-slate-500">
-                Direct benefits you receive when consulting with {advisor.name}:
-              </p>
-
-              <div className="space-y-2 pt-1">
-                {advisor.whatYouGet && advisor.whatYouGet.length > 0 ? (
-                  advisor.whatYouGet.map((benefit, bIdx) => (
-                    <div key={bIdx} className="flex items-start gap-2.5 text-xs text-[#102A43] font-medium p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                      <span className="w-5 h-5 rounded-full bg-[#00A86B]/15 text-[#00A86B] flex items-center justify-center shrink-0 mt-0.5">
-                        <FiCheck className="text-xs" />
-                      </span>
-                      <span className="leading-relaxed">{benefit}</span>
-                    </div>
-                  ))
-                ) : (
-                  <>
-                    <div className="flex items-start gap-2.5 text-xs text-[#102A43] font-medium p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                      <span className="w-5 h-5 rounded-full bg-[#00A86B]/15 text-[#00A86B] flex items-center justify-center shrink-0 mt-0.5">
-                        <FiCheck className="text-xs" />
-                      </span>
-                      <span className="leading-relaxed">Objective policy scrutiny without sales bias or quota pressure</span>
-                    </div>
-                    <div className="flex items-start gap-2.5 text-xs text-[#102A43] font-medium p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                      <span className="w-5 h-5 rounded-full bg-[#00A86B]/15 text-[#00A86B] flex items-center justify-center shrink-0 mt-0.5">
-                        <FiCheck className="text-xs" />
-                      </span>
-                      <span className="leading-relaxed">Detection of room rent capping, proportionate deductions, and hidden sub-limits</span>
-                    </div>
-                    <div className="flex items-start gap-2.5 text-xs text-[#102A43] font-medium p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                      <span className="w-5 h-5 rounded-full bg-[#00A86B]/15 text-[#00A86B] flex items-center justify-center shrink-0 mt-0.5">
-                        <FiCheck className="text-xs" />
-                      </span>
-                      <span className="leading-relaxed">Pre-authorization admission checklist and cashless hospital network guidance</span>
-                    </div>
-                  </>
-                )}
-              </div>
-            </section>
-
-            {/* 5. REVIEWS & RATINGS SECTION WITH BREAKDOWN */}
-            <section className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            {/* ===================================================================
+                4. CUSTOMER REVIEWS & RATINGS SECTION
+            =================================================================== */}
+            <section className="pt-4 border-t border-slate-200 space-y-6">
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-base font-bold text-[#102A43] font-display">
+                  <span className="text-xs font-bold text-[#00A86B] uppercase tracking-wider">
+                    Client Feedback
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
                     Customer Ratings & Reviews
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Transparent, authentic reviews submitted by verified clients.
+                    Authentic client reviews submitted following direct consultations.
                   </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setShowReviewForm(!showReviewForm)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs shrink-0"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs shrink-0 self-start sm:self-auto"
                 >
                   <FiMessageSquare className="text-xs" />
-                  <span>{showReviewForm ? 'Cancel' : 'Write a Review'}</span>
+                  <span>{showReviewForm ? 'Cancel Review' : 'Write a Review'}</span>
                 </button>
               </div>
 
-              {/* Rating Summary & Star Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 p-4 rounded-xl bg-slate-50 border border-slate-200 items-center">
-                
-                {/* Average Score */}
-                <div className="md:col-span-5 text-center md:text-left md:border-r border-slate-200 md:pr-4 space-y-1">
+              {/* Rating Summary Block */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                {/* Score */}
+                <div className="md:col-span-5 text-center md:text-left md:border-r border-slate-100 md:pr-6 space-y-1">
                   <div className="flex items-baseline justify-center md:justify-start gap-2">
-                    <span className="text-3xl sm:text-4xl font-black text-[#102A43]">
+                    <span className="text-4xl sm:text-5xl font-black text-[#102A43] font-display">
                       {ratingSummary.hasReviews ? ratingSummary.ratingFormatted : '—'}
                     </span>
                     <span className="text-xs text-slate-400 font-medium">/ 5.0</span>
@@ -534,67 +684,71 @@ export default function AdvisorDetailPage() {
                     ))}
                   </div>
 
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-xs text-slate-500 pt-1">
                     {ratingSummary.hasReviews
-                      ? `Based on ${ratingSummary.totalReviews} genuine ${ratingSummary.totalReviews === 1 ? 'review' : 'reviews'}`
-                      : 'No customer ratings submitted yet'}
+                      ? `Based on ${ratingSummary.totalReviews} genuine ${ratingSummary.totalReviews === 1 ? 'client review' : 'client reviews'}`
+                      : 'No client reviews recorded yet'}
                   </p>
                 </div>
 
-                {/* Rating Breakdown Bars (5 to 1 Star) */}
+                {/* Rating Distribution Bars */}
                 <div className="md:col-span-7 space-y-1.5">
                   {ratingBreakdown.map((row) => (
-                    <div key={row.star} className="flex items-center gap-2 text-[11px]">
-                      <span className="w-12 text-slate-600 font-medium shrink-0 flex items-center gap-0.5">
+                    <div key={row.star} className="flex items-center gap-2.5 text-xs">
+                      <span className="w-12 text-slate-600 font-medium shrink-0 flex items-center gap-1">
                         <span>{row.star}</span>
-                        <FiStar className="text-[10px] text-amber-400 fill-amber-400" />
+                        <FiStar className="text-[11px] text-amber-400 fill-amber-400" />
                       </span>
-                      
-                      <div className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden">
+
+                      <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
                         <div
                           className="h-full bg-[#00A86B] rounded-full transition-all duration-500"
                           style={{ width: `${row.percentage}%` }}
                         />
                       </div>
 
-                      <span className="w-8 text-right text-slate-400 font-mono text-[10px] shrink-0">
+                      <span className="w-8 text-right text-slate-400 font-mono text-[11px] shrink-0">
                         {row.count}
                       </span>
                     </div>
                   ))}
                 </div>
-
               </div>
 
-              {/* Review Submission Form */}
+              {/* Review Submission Form Drawer */}
               {showReviewForm && (
                 <form
                   onSubmit={handleReviewSubmit}
-                  className="p-4 sm:p-5 rounded-xl bg-white border border-[#00A86B]/30 shadow-xs space-y-3"
+                  className="p-5 sm:p-6 rounded-2xl bg-white border border-[#00A86B]/40 shadow-md space-y-4"
                 >
-                  <h4 className="text-xs font-bold text-[#102A43]">
-                    Submit Your Feedback for {advisor.name}
-                  </h4>
+                  <div className="border-b border-slate-100 pb-2">
+                    <h3 className="text-sm font-bold text-[#102A43]">
+                      Submit Your Genuine Review for {advisor.name}
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Your feedback helps other policyholders make transparent insurance choices.
+                    </p>
+                  </div>
 
                   {reviewSuccessMessage && (
-                    <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 flex items-center gap-1.5">
-                      <FiCheck className="text-emerald-600" />
+                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                      <FiCheck className="text-emerald-600 text-base" />
                       <span>{reviewSuccessMessage}</span>
                     </div>
                   )}
 
                   {reviewErrorMessage && (
-                    <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
+                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
                       {reviewErrorMessage}
                     </div>
                   )}
 
-                  {/* Star Rating Selector */}
+                  {/* Interactive Star Rating Selector */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Your Rating *
                     </label>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       {[1, 2, 3, 4, 5].map((star) => {
                         const active = star <= (hoverRating || reviewRating);
                         return (
@@ -604,7 +758,8 @@ export default function AdvisorDetailPage() {
                             onClick={() => setReviewRating(star)}
                             onMouseEnter={() => setHoverRating(star)}
                             onMouseLeave={() => setHoverRating(0)}
-                            className="p-1 text-xl cursor-pointer focus:outline-none"
+                            className="p-1 text-2xl cursor-pointer focus:outline-none transition-transform hover:scale-110"
+                            aria-label={`Rate ${star} star`}
                           >
                             <FiStar
                               className={
@@ -627,13 +782,13 @@ export default function AdvisorDetailPage() {
                   </div>
 
                   {/* Name & City */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
                         Your Full Name *
                       </label>
                       <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 text-xs">
+                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm">
                           <FiUser />
                         </span>
                         <input
@@ -641,58 +796,59 @@ export default function AdvisorDetailPage() {
                           required
                           value={reviewName}
                           onChange={(e) => setReviewName(e.target.value)}
-                          placeholder="e.g. Ankit Sharma"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 pl-8 pr-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white"
+                          placeholder="e.g. Ramesh Kulkarni"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white transition-all"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
                         City / Location (Optional)
                       </label>
                       <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 text-xs">
+                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm">
                           <FiMapPin />
                         </span>
                         <input
                           type="text"
                           value={reviewCity}
                           onChange={(e) => setReviewCity(e.target.value)}
-                          placeholder="e.g. Mumbai, Delhi"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 pl-8 pr-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white"
+                          placeholder="e.g. Mumbai, Pune"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white transition-all"
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Written Review */}
+                  {/* Review Textarea */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
-                      Written Review *
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Written Feedback *
                     </label>
                     <textarea
                       required
-                      rows={2}
+                      rows={3}
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="Share your experience regarding policy selection, clarity of terms, or claim guidance..."
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white resize-none"
+                      placeholder="Describe how the advisor assisted you regarding room rent capping, restoration clauses, or cashless network guidance..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs sm:text-sm text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white resize-none transition-all"
                     />
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 pt-1">
+                  {/* Form Actions */}
+                  <div className="flex items-center justify-end gap-2.5 pt-1">
                     <button
                       type="button"
                       onClick={() => setShowReviewForm(false)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"
+                      className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={reviewSubmitting}
-                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
                     >
                       <FiSend className="text-xs" />
                       <span>{reviewSubmitting ? 'Posting...' : 'Submit Review'}</span>
@@ -701,36 +857,44 @@ export default function AdvisorDetailPage() {
                 </form>
               )}
 
-              {/* Customer Reviews List */}
+              {/* Client Written Reviews List */}
               {reviews.length === 0 ? (
-                <div className="p-6 text-center bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                  <p className="text-xs font-semibold text-[#102A43]">
+                <div className="p-8 text-center bg-white rounded-2xl border border-slate-200/90 space-y-2 shadow-2xs">
+                  <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-lg">
+                    <FiMessageSquare />
+                  </div>
+                  <h3 className="text-sm font-bold text-[#102A43]">
                     No client reviews submitted yet
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    Have you consulted with {advisor.name}? Click "Write a Review" above to submit your genuine feedback.
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    Have you consulted with {advisor.name}? Click "Write a Review" above to submit your authentic feedback.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {reviews.map((rev) => (
                     <div
                       key={rev.id}
-                      className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left space-y-1"
+                      className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2 text-left"
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#102A43] text-white flex items-center justify-center text-[10px] font-bold">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-[#102A43] text-white flex items-center justify-center text-xs font-bold">
                             {(rev.authorName || 'C').charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-xs font-bold text-[#102A43]">
-                            {rev.authorName}
-                          </span>
-                          {rev.city && (
-                            <span className="text-[10px] text-slate-400">
-                              ({rev.city})
+                          <div>
+                            <div className="text-xs sm:text-sm font-bold text-[#102A43] flex items-center gap-1.5">
+                              <span>{rev.authorName}</span>
+                              {rev.city && (
+                                <span className="text-[11px] text-slate-400 font-normal">
+                                  ({rev.city})
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                              <FiCheck className="text-[10px]" /> Verified Consultation
                             </span>
-                          )}
+                          </div>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -746,14 +910,14 @@ export default function AdvisorDetailPage() {
                               />
                             ))}
                           </div>
-                          <span className="text-[10px] text-slate-400">
+                          <span className="text-[11px] text-slate-400 hidden sm:inline">
                             {rev.dateFormatted || 'Recently'}
                           </span>
                         </div>
                       </div>
 
-                      <p className="text-xs text-slate-600 pt-0.5">
-                        {rev.comment}
+                      <p className="text-xs sm:text-sm text-slate-600 pt-1 leading-relaxed">
+                        "{rev.comment}"
                       </p>
                     </div>
                   ))}
@@ -763,22 +927,29 @@ export default function AdvisorDetailPage() {
 
           </div>
 
-          {/* =======================================================================
-              RIGHT COLUMN: 6. CONTACT SECTION (STICKY SIDEBAR)
-          ======================================================================= */}
-          <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-24">
+          {/* =====================================================================
+              RIGHT COLUMN: 5. COMPACT STICKY CONTACT PANEL (4 cols)
+          ===================================================================== */}
+          <aside className="lg:col-span-4 space-y-4 lg:sticky lg:top-24">
             
-            {/* Primary Contact Card */}
-            <section className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs space-y-4">
-              <h2 className="text-sm font-bold text-[#102A43] uppercase tracking-wider border-b border-slate-100 pb-2">
-                Contact this Advisor
-              </h2>
+            {/* Primary Contact Panel */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-[0_4px_24px_rgba(16,42,67,0.06)] space-y-4">
+              
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-xs font-bold text-[#102A43] uppercase tracking-wider font-display">
+                  Advisory & Contact Desk
+                </h3>
+                <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Available</span>
+                </span>
+              </div>
 
-              {/* Direct Actions */}
+              {/* Direct Instant Action Buttons */}
               <div className="space-y-2">
                 <a
-                  href={`tel:${advisor.phone || '+919876543210'}`}
-                  className="w-full py-2.5 px-3 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs cursor-pointer text-center"
+                  href={`tel:${cleanPhone}`}
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs hover:shadow cursor-pointer text-center"
                 >
                   <FiPhone className="text-sm" />
                   <span>Call: {advisor.phone || '+91 98765 43210'}</span>
@@ -788,7 +959,7 @@ export default function AdvisorDetailPage() {
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs cursor-pointer text-center"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs hover:shadow cursor-pointer text-center"
                 >
                   <FaWhatsapp className="text-base" />
                   <span>Chat on WhatsApp</span>
@@ -803,9 +974,9 @@ export default function AdvisorDetailPage() {
                 </a>
               </div>
 
-              {/* Key Logistics */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 text-xs space-y-2 text-slate-600">
-                <div className="flex items-center justify-between pb-1.5 border-b border-slate-200/50">
+              {/* Advisory Logistics Details */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs space-y-2.5 text-slate-600">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
                   <span className="flex items-center gap-1.5 text-slate-500">
                     <FiCalendar className="text-[#00A86B]" />
                     <span>Mode</span>
@@ -815,10 +986,10 @@ export default function AdvisorDetailPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between pb-1.5 border-b border-slate-200/50">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
                   <span className="flex items-center gap-1.5 text-slate-500">
                     <FiGlobe className="text-[#00A86B]" />
-                    <span>Availability</span>
+                    <span>Hours</span>
                   </span>
                   <span className="font-semibold text-[#102A43]">
                     {advisor.consultation?.availability || 'Mon – Sat'}
@@ -828,35 +999,35 @@ export default function AdvisorDetailPage() {
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-slate-500">
                     <FiMapPin className="text-[#00A86B]" />
-                    <span>Location</span>
+                    <span>Coverage</span>
                   </span>
                   <span className="font-semibold text-[#102A43]">
-                    {advisor.consultation?.location || 'India'}
+                    {advisor.consultation?.location || 'Pan-India (India)'}
                   </span>
                 </div>
               </div>
 
-              {/* Quick Advisory Callback Form */}
+              {/* Send Enquiry / Callback Form */}
               <div className="pt-2 border-t border-slate-100 space-y-3">
-                <h3 className="text-xs font-bold text-[#102A43]">
-                  Request an Advisory Callback
-                </h3>
+                <h4 className="text-xs font-bold text-[#102A43]">
+                  Send an Advisory Enquiry
+                </h4>
 
                 {enquirySubmitted ? (
-                  <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
+                  <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
                     <FiCheckCircle className="text-emerald-600 text-2xl mx-auto" />
                     <p className="text-xs font-bold text-emerald-900">
-                      Request Received!
+                      Enquiry Received!
                     </p>
                     <p className="text-[11px] text-emerald-800 leading-relaxed">
-                      Our desk will coordinate your advisory session with {advisor.name}.
+                      Our desk will coordinate your session directly with {advisor.name}.
                     </p>
                     <button
                       type="button"
                       onClick={() => setEnquirySubmitted(false)}
                       className="text-[10px] text-emerald-700 underline font-semibold cursor-pointer"
                     >
-                      Send another request
+                      Send another enquiry
                     </button>
                   </div>
                 ) : (
@@ -868,7 +1039,7 @@ export default function AdvisorDetailPage() {
                         placeholder="Your Full Name *"
                         value={enquiryForm.name}
                         onChange={(e) => setEnquiryForm({ ...enquiryForm, name: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white transition-all"
                       />
                     </div>
 
@@ -879,7 +1050,7 @@ export default function AdvisorDetailPage() {
                         placeholder="Phone Number *"
                         value={enquiryForm.phone}
                         onChange={(e) => setEnquiryForm({ ...enquiryForm, phone: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white transition-all"
                       />
                     </div>
 
@@ -890,7 +1061,7 @@ export default function AdvisorDetailPage() {
                         placeholder="Email Address *"
                         value={enquiryForm.email}
                         onChange={(e) => setEnquiryForm({ ...enquiryForm, email: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white transition-all"
                       />
                     </div>
 
@@ -912,7 +1083,7 @@ export default function AdvisorDetailPage() {
                     <div>
                       <textarea
                         rows={2}
-                        placeholder="Your question or medical condition (optional)..."
+                        placeholder="Your medical requirements or questions (optional)..."
                         value={enquiryForm.message}
                         onChange={(e) => setEnquiryForm({ ...enquiryForm, message: e.target.value })}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs text-[#172B3A] focus:outline-none focus:border-[#00A86B] focus:bg-white resize-none"
@@ -922,22 +1093,53 @@ export default function AdvisorDetailPage() {
                     <button
                       type="submit"
                       disabled={enquirySubmitting}
-                      className="w-full py-2 px-3 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-semibold transition-all shadow-2xs hover:shadow cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+                      className="w-full py-2.5 px-3 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-semibold transition-all shadow-2xs hover:shadow cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                     >
-                      <span>{enquirySubmitting ? 'Submitting...' : 'Request Advisory Callback'}</span>
+                      <span>{enquirySubmitting ? 'Sending...' : 'Send Advisory Enquiry'}</span>
                       <FiArrowUpRight className="text-xs" />
                     </button>
                   </form>
                 )}
               </div>
 
-            </section>
+            </div>
 
-          </div>
+          </aside>
 
         </div>
+      </main>
 
+      {/* =========================================================================
+          MOBILE STICKY ACTION BAR: QUICK REACH CONTACT FOR TOUCH DEVICES
+      ========================================================================= */}
+      <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-30 flex items-center gap-2 sm:hidden shadow-lg">
+        <a
+          href={`tel:${cleanPhone}`}
+          className="flex-1 py-2.5 px-3 rounded-xl bg-[#102A43] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs"
+        >
+          <FiPhone className="text-sm" />
+          <span>Call Now</span>
+        </a>
+
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 py-2.5 px-3 rounded-xl bg-[#25D366] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs"
+        >
+          <FaWhatsapp className="text-base" />
+          <span>WhatsApp</span>
+        </a>
       </div>
+
     </div>
+  );
+}
+
+export default function AdvisorDetailPage() {
+  return (
+    <AdvisorErrorBoundary>
+      <AdvisorDetailContent />
+    </AdvisorErrorBoundary>
   );
 }

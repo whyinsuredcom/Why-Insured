@@ -9,6 +9,7 @@ import {
   FiUsers
 } from 'react-icons/fi';
 import { companiesData } from '../data/companies';
+import { safeSessionStorage } from '../utils/safeStorage';
 import { searchGlobalInsurance } from '../utils/globalSearchHelper';
 import { detectQueryIntent } from '../utils/searchIntentDetector';
 import RealInsuranceSearchResultPanel from '../components/RealInsuranceSearchResultPanel';
@@ -31,7 +32,7 @@ export default function Home() {
     if (searchParams.get('q')) {
       setSearchParams({}, { replace: true });
     }
-    sessionStorage.removeItem('whyinsured_last_search_query');
+    safeSessionStorage.removeItem('whyinsured_last_search_query');
   }, []);
 
   // Update query state (in-memory React state only, no URL parameter pollution on live typing)
@@ -45,7 +46,7 @@ export default function Home() {
       setIsChatActive(false);
       setActiveChatQuery('');
       setSearchQuery('');
-      sessionStorage.removeItem('whyinsured_last_search_query');
+      safeSessionStorage.removeItem('whyinsured_last_search_query');
       if (searchParams.get('q')) {
         setSearchParams({}, { replace: true });
       }
@@ -58,7 +59,7 @@ export default function Home() {
   // Clean up any search query storage when leaving the Home page
   useEffect(() => {
     return () => {
-      sessionStorage.removeItem('whyinsured_last_search_query');
+      safeSessionStorage.removeItem('whyinsured_last_search_query');
     };
   }, []);
 
@@ -113,7 +114,7 @@ export default function Home() {
     setIsChatActive(false);
     setActiveChatQuery('');
     setSearchQuery('');
-    sessionStorage.removeItem('whyinsured_last_search_query');
+    safeSessionStorage.removeItem('whyinsured_last_search_query');
     if (searchParams.get('q')) {
       setSearchParams({}, { replace: true });
     }

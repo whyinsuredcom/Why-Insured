@@ -10,6 +10,7 @@ import {
   FiArrowUpRight
 } from 'react-icons/fi';
 import logoImg from '../assets/logo.png';
+import { safeSessionStorage } from '../utils/safeStorage';
 
 export const WHYINSURED_CONTACT_EMAIL = "whyinsured3@gmail.com";
 export const FOOTER_CONTACT_EMAIL = WHYINSURED_CONTACT_EMAIL;
@@ -20,7 +21,6 @@ export default function Footer() {
   const quickLinks = [
     { name: 'Health Insurance', path: '/' },
     { name: 'Compare Plans', path: '/compare' },
-    { name: 'Claims', path: '/claim' },
     { name: 'Advisors', path: '/advisors' },
     { name: 'Insurance Academy', path: '/academy' }
   ];
@@ -66,7 +66,7 @@ export default function Footer() {
               <Link
                 to="/"
                 onClick={() => {
-                  sessionStorage.removeItem('whyinsured_last_search_query');
+                  safeSessionStorage.removeItem('whyinsured_last_search_query');
                   window.dispatchEvent(new CustomEvent('whyinsured-reset-search'));
                 }}
                 className="inline-flex items-center gap-2 group"
@@ -110,7 +110,7 @@ export default function Footer() {
                       to={link.path}
                       onClick={() => {
                         if (link.path === '/') {
-                          sessionStorage.removeItem('whyinsured_last_search_query');
+                          safeSessionStorage.removeItem('whyinsured_last_search_query');
                           window.dispatchEvent(new CustomEvent('whyinsured-reset-search'));
                         }
                       }}

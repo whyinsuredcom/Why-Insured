@@ -1453,27 +1453,6 @@ export default function HdfcPlanDetailSection({ plan, company, planId: planIdPro
               <FiArrowRight className="text-xs sm:text-sm group-hover:translate-x-0.5 transition-transform duration-200" />
             </div>
           </button>
-
-          {/* Card 6: PERFECT FOR */}
-          <button
-            type="button"
-            onClick={() => setActiveModal('bestSuitedFor')}
-            className={`bg-white rounded-xl sm:rounded-2xl border p-2.5 sm:p-4 md:p-5 flex items-center justify-between text-left shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.98] select-none ${
-              activeModal === 'bestSuitedFor'
-                ? 'border-[#E30613] ring-2 ring-[#E30613]/20'
-                : 'border-slate-200/80 hover:border-[#E30613]/40'
-            }`}
-          >
-            <div className={`absolute bottom-0 left-0 right-0 h-[2.5px] transition-colors duration-200 ${
-              activeModal === 'bestSuitedFor' ? 'bg-[#E30613]' : 'bg-[#E30613]/30 group-hover:bg-[#E30613]'
-            }`} />
-            <h3 className="text-xs sm:text-base font-extrabold text-[#0F172A] group-hover:text-[#E30613] transition-colors duration-200 font-display leading-tight pr-1 tracking-tight">
-              {planData.perfectForButtonLabel || 'PERFECT FOR'}
-            </h3>
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-[#E30613] group-hover:bg-[#FFF5F5] group-hover:border-[#E30613]/20 transition-all duration-200 shrink-0">
-              <FiArrowRight className="text-xs sm:text-sm group-hover:translate-x-0.5 transition-transform duration-200" />
-            </div>
-          </button>
         </div>
       </div>
 
@@ -2064,7 +2043,65 @@ export default function HdfcPlanDetailSection({ plan, company, planId: planIdPro
                     <p className="must-know-subheading">
                       {planData.mustKnow.subheading}
                     </p>
+                                    {/* PERFECT FOR SECTION (MERGED INTO MUST KNOW) */}
+                  <div className="pt-4 sm:pt-5 border-t border-slate-200/80 space-y-3.5 sm:space-y-4">
+                    <div className="pr-8">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight font-display">
+                        PERFECT FOR
+                      </h3>
+                      <p className="text-xs text-[#E30613] font-medium mt-0.5">
+                        {planData.bestSuitedFor?.subheading || planData.perfectFor?.subheading || 'Who is this plan perfect for?'}
+                      </p>
+                      {(planData.bestSuitedFor?.description || planData.perfectFor?.description) && (
+                        <p className="text-xs text-slate-500 font-normal mt-0.5">
+                          {planData.bestSuitedFor?.description || planData.perfectFor?.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {((planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).length > 0) ? (
+                      <div className="space-y-3">
+                        {(planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).map((profile, idx) => (
+                          <div
+                            key={profile.id || idx}
+                            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-[#E30613]/30 shadow-2xs space-y-2 text-left hover:border-[#E30613]/60 transition-colors"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg sm:text-xl shrink-0 select-none">{profile.icon || '👤'}</span>
+                                <h4 className="text-xs sm:text-sm font-extrabold text-[#0F172A] font-display">
+                                  {profile.title}
+                                </h4>
+                              </div>
+                              {profile.badge && (
+                                <span className="inline-block text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFF5F5] text-[#E30613] border border-[#E30613]/20 shrink-0 font-display">
+                                  {profile.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                              {profile.summary || profile.description}
+                            </p>
+                            {profile.highlights && (
+                              <ul className="space-y-1 pt-1.5 border-t border-slate-100">
+                                {profile.highlights.map((hl, hlIdx) => (
+                                  <li key={hlIdx} className="flex items-start gap-1.5 text-xs text-slate-700 font-medium">
+                                    <FiCheck className="text-[#E30613] mt-0.5 shrink-0 text-xs" />
+                                    <span>{hl}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-slate-500 text-xs sm:text-sm font-medium">
+                        Information not available for this plan.
+                      </div>
+                    )}
                   </div>
+                </div>
 
                   <div className="space-y-3 sm:space-y-3.5">
                     {planData.mustKnow.items.map((item) => (
@@ -2089,120 +2126,275 @@ export default function HdfcPlanDetailSection({ plan, company, planId: planIdPro
                       </div>
                     ))}
                   </div>
+
+                  {/* PERFECT FOR SECTION (MERGED INTO MUST KNOW) */}
+                  <div className="pt-4 sm:pt-5 border-t border-slate-200/80 space-y-3.5 sm:space-y-4">
+                    <div className="pr-8">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight font-display">
+                        PERFECT FOR
+                      </h3>
+                      <p className="text-xs text-[#E30613] font-medium mt-0.5">
+                        {planData.bestSuitedFor?.subheading || planData.perfectFor?.subheading || 'Who is this plan perfect for?'}
+                      </p>
+                      {(planData.bestSuitedFor?.description || planData.perfectFor?.description) && (
+                        <p className="text-xs text-slate-500 font-normal mt-0.5">
+                          {planData.bestSuitedFor?.description || planData.perfectFor?.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {((planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).length > 0) ? (
+                      <div className="space-y-3">
+                        {(planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).map((profile, idx) => (
+                          <div
+                            key={profile.id || idx}
+                            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-[#E30613]/30 shadow-2xs space-y-2 text-left hover:border-[#E30613]/60 transition-colors"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg sm:text-xl shrink-0 select-none">{profile.icon || '👤'}</span>
+                                <h4 className="text-xs sm:text-sm font-extrabold text-[#0F172A] font-display">
+                                  {profile.title}
+                                </h4>
+                              </div>
+                              {profile.badge && (
+                                <span className="inline-block text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFF5F5] text-[#E30613] border border-[#E30613]/20 shrink-0 font-display">
+                                  {profile.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                              {profile.summary || profile.description}
+                            </p>
+                            {profile.highlights && (
+                              <ul className="space-y-1 pt-1.5 border-t border-slate-100">
+                                {profile.highlights.map((hl, hlIdx) => (
+                                  <li key={hlIdx} className="flex items-start gap-1.5 text-xs text-slate-700 font-medium">
+                                    <FiCheck className="text-[#E30613] mt-0.5 shrink-0 text-xs" />
+                                    <span>{hl}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-slate-500 text-xs sm:text-sm font-medium">
+                        Information not available for this plan.
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* MODAL 4: MUST KNOW (other HDFC plans) */}
-              {activeModal === 'mustKnow' && !isOptimaSecurePlusMustKnow && planData.mustKnow?.highlights && (
+              {activeModal === 'mustKnow' && !isOptimaSecurePlusMustKnow && (
                 <div className="space-y-4 sm:space-y-5">
-                  <div className="must-know-header">
-                    <div className="flex items-center gap-1.5 must-know-badge-tag text-[#E30613] mb-0.5">
-                      <span>★</span>
-                      <span>{planData.mustKnow.subheading}</span>
-                    </div>
-                    <h2 className="must-know-main-heading">
-                      {planData.mustKnow.heading}
-                    </h2>
-                    <p className="must-know-subheading">
-                      {planData.mustKnow.description}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 sm:space-y-3.5">
-                    {planData.mustKnow.highlights.map((hl, hlIdx) => (
-                      <div
-                        key={hlIdx}
-                        className={`must-know-card border space-y-2 sm:space-y-2.5 shadow-2xs ${hl.theme === 'primary'
-                          ? 'bg-[#FFF5F5] border-[#E30613]/25'
-                          : 'bg-slate-50/80 border-slate-100'
-                          }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded border ${hl.theme === 'primary'
-                            ? 'text-[#E30613] bg-white border-[#E30613]/20'
-                            : 'text-slate-700 bg-white border-slate-200'
-                            }`}>
-                            {hl.badge}
-                          </span>
-                          <span className={`text-[11px] sm:text-xs font-bold ${hl.theme === 'primary' ? 'text-emerald-600' : 'text-[#E30613]'
-                            }`}>
-                            {hl.tag}
-                          </span>
+                  {planData.mustKnow?.highlights && (
+                    <>
+                      <div className="must-know-header">
+                        <div className="flex items-center gap-1.5 must-know-badge-tag text-[#E30613] mb-0.5">
+                          <span>★</span>
+                          <span>{planData.mustKnow.subheading}</span>
                         </div>
-                        <h4 className="must-know-card-title">
-                          {hl.title}
-                        </h4>
-                        <p className="must-know-body-text">
-                          {hl.description}
+                        <h2 className="must-know-main-heading">
+                          {planData.mustKnow.heading}
+                        </h2>
+                        <p className="must-know-subheading">
+                          {planData.mustKnow.description}
                         </p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
-                                                        
-              {/* MODAL 5: PERFECT FOR */}
-              {(activeModal === 'bestSuitedFor' || activeModal === 'perfectFor') && (
-                <div className="space-y-4 sm:space-y-5">
-                  <div className="pr-8">
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight font-display">
-                      PERFECT FOR
-                    </h2>
-                    <p className="text-xs text-[#E30613] font-medium mt-0.5">
-                      {planData.bestSuitedFor?.subheading || planData.perfectFor?.subheading || 'Who is this plan perfect for?'}
-                    </p>
-                    {(planData.bestSuitedFor?.description || planData.perfectFor?.description) && (
-                      <p className="text-xs text-slate-500 font-normal mt-0.5">
-                        {planData.bestSuitedFor?.description || planData.perfectFor?.description}
-                      </p>
-                    )}
-                  </div>
-
-                  {((planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).length > 0) ? (
-                    <div className="space-y-3">
-                      {(planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).map((profile, idx) => (
-                        <div
-                          key={profile.id || idx}
-                          className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-[#E30613]/30 shadow-2xs space-y-2 text-left hover:border-[#E30613]/60 transition-colors"
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg sm:text-xl shrink-0 select-none">{profile.icon || '👤'}</span>
-                              <h4 className="text-xs sm:text-sm font-extrabold text-[#0F172A] font-display">
-                                {profile.title}
-                              </h4>
-                            </div>
-                            {profile.badge && (
-                              <span className="inline-block text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFF5F5] text-[#E30613] border border-[#E30613]/20 shrink-0 font-display">
-                                {profile.badge}
+                      <div className="space-y-3 sm:space-y-3.5">
+                        {planData.mustKnow.highlights.map((hl, hlIdx) => (
+                          <div
+                            key={hlIdx}
+                            className={`must-know-card border space-y-2 sm:space-y-2.5 shadow-2xs ${hl.theme === 'primary'
+                              ? 'bg-[#FFF5F5] border-[#E30613]/25'
+                              : 'bg-slate-50/80 border-slate-100'
+                              }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded border ${hl.theme === 'primary'
+                                ? 'text-[#E30613] bg-white border-[#E30613]/20'
+                                : 'text-slate-700 bg-white border-slate-200'
+                                }`}>
+                                {hl.badge}
                               </span>
+                              <span className={`text-[11px] sm:text-xs font-bold ${hl.theme === 'primary' ? 'text-emerald-600' : 'text-[#E30613]'
+                                }`}>
+                                {hl.tag}
+                              </span>
+                            </div>
+                            <h4 className="must-know-card-title">
+                              {hl.title}
+                            </h4>
+                            <p className="must-know-body-text">
+                              {hl.description}
+                            </p>
+                                            {/* PERFECT FOR SECTION (MERGED INTO MUST KNOW) */}
+                  <div className="pt-4 sm:pt-5 border-t border-slate-200/80 space-y-3.5 sm:space-y-4">
+                    <div className="pr-8">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight font-display">
+                        PERFECT FOR
+                      </h3>
+                      <p className="text-xs text-[#E30613] font-medium mt-0.5">
+                        {planData.bestSuitedFor?.subheading || planData.perfectFor?.subheading || 'Who is this plan perfect for?'}
+                      </p>
+                      {(planData.bestSuitedFor?.description || planData.perfectFor?.description) && (
+                        <p className="text-xs text-slate-500 font-normal mt-0.5">
+                          {planData.bestSuitedFor?.description || planData.perfectFor?.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {((planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).length > 0) ? (
+                      <div className="space-y-3">
+                        {(planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).map((profile, idx) => (
+                          <div
+                            key={profile.id || idx}
+                            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-[#E30613]/30 shadow-2xs space-y-2 text-left hover:border-[#E30613]/60 transition-colors"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg sm:text-xl shrink-0 select-none">{profile.icon || '👤'}</span>
+                                <h4 className="text-xs sm:text-sm font-extrabold text-[#0F172A] font-display">
+                                  {profile.title}
+                                </h4>
+                              </div>
+                              {profile.badge && (
+                                <span className="inline-block text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFF5F5] text-[#E30613] border border-[#E30613]/20 shrink-0 font-display">
+                                  {profile.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                              {profile.summary || profile.description}
+                            </p>
+                            {profile.highlights && (
+                              <ul className="space-y-1 pt-1.5 border-t border-slate-100">
+                                {profile.highlights.map((hl, hlIdx) => (
+                                  <li key={hlIdx} className="flex items-start gap-1.5 text-xs text-slate-700 font-medium">
+                                    <FiCheck className="text-[#E30613] mt-0.5 shrink-0 text-xs" />
+                                    <span>{hl}</span>
+                                  </li>
+                                ))}
+                              </ul>
                             )}
                           </div>
-                          <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                            {profile.summary || profile.description}
-                          </p>
-                          {profile.highlights && (
-                            <ul className="space-y-1 pt-1.5 border-t border-slate-100">
-                              {profile.highlights.map((hl, hlIdx) => (
-                                <li key={hlIdx} className="flex items-start gap-1.5 text-xs text-slate-700 font-medium">
-                                  <FiCheck className="text-[#E30613] mt-0.5 shrink-0 text-xs" />
-                                  <span>{hl}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-slate-500 text-xs sm:text-sm font-medium">
-                      Information not available for this plan.
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-slate-500 text-xs sm:text-sm font-medium">
+                        Information not available for this plan.
+                      </div>
+                    )}
+                  </div>
+                </div>
+                        ))}
+                      </div>
+                    </>
                   )}
+
+                  {planData.mustKnow?.items && !planData.mustKnow?.highlights && (
+                    <>
+                      <div className="must-know-header">
+                        <h2 className="must-know-main-heading">
+                          {planData.mustKnow.heading || 'MUST KNOW DETAILS'}
+                        </h2>
+                        <p className="must-know-subheading">
+                          {planData.mustKnow.subheading || 'Essential plan conditions and highlights'}
+                        </p>
+                      </div>
+
+                      <div className="space-y-3 sm:space-y-3.5">
+                        {planData.mustKnow.items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="must-know-card border border-[#E30613]/20 bg-[#FFF5F5]/40 space-y-2 sm:space-y-2.5 shadow-2xs"
+                          >
+                            <h4 className="must-know-card-title">
+                              <span className="shrink-0 text-base sm:text-lg">{item.icon}</span>
+                              <span>{item.title}</span>
+                            </h4>
+                            {item.paragraphs && (
+                              <div className="must-know-paragraphs-container">
+                                {item.paragraphs.map((paragraph, pIdx) => (
+                                  <p key={pIdx} className="must-know-body-text">
+                                    {paragraph}
+                                  </p>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {/* PERFECT FOR SECTION (MERGED INTO MUST KNOW) */}
+                  <div className="pt-4 sm:pt-5 border-t border-slate-200/80 space-y-3.5 sm:space-y-4">
+                    <div className="pr-8">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight font-display">
+                        PERFECT FOR
+                      </h3>
+                      <p className="text-xs text-[#E30613] font-medium mt-0.5">
+                        {planData.bestSuitedFor?.subheading || planData.perfectFor?.subheading || 'Who is this plan perfect for?'}
+                      </p>
+                      {(planData.bestSuitedFor?.description || planData.perfectFor?.description) && (
+                        <p className="text-xs text-slate-500 font-normal mt-0.5">
+                          {planData.bestSuitedFor?.description || planData.perfectFor?.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {((planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).length > 0) ? (
+                      <div className="space-y-3">
+                        {(planData.bestSuitedFor?.profiles || planData.perfectFor?.items || []).map((profile, idx) => (
+                          <div
+                            key={profile.id || idx}
+                            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-[#E30613]/30 shadow-2xs space-y-2 text-left hover:border-[#E30613]/60 transition-colors"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg sm:text-xl shrink-0 select-none">{profile.icon || '👤'}</span>
+                                <h4 className="text-xs sm:text-sm font-extrabold text-[#0F172A] font-display">
+                                  {profile.title}
+                                </h4>
+                              </div>
+                              {profile.badge && (
+                                <span className="inline-block text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFF5F5] text-[#E30613] border border-[#E30613]/20 shrink-0 font-display">
+                                  {profile.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                              {profile.summary || profile.description}
+                            </p>
+                            {profile.highlights && (
+                              <ul className="space-y-1 pt-1.5 border-t border-slate-100">
+                                {profile.highlights.map((hl, hlIdx) => (
+                                  <li key={hlIdx} className="flex items-start gap-1.5 text-xs text-slate-700 font-medium">
+                                    <FiCheck className="text-[#E30613] mt-0.5 shrink-0 text-xs" />
+                                    <span>{hl}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-slate-500 text-xs sm:text-sm font-medium">
+                        Information not available for this plan.
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
-            </motion.div>
+
+</motion.div>
           </div>
         )}
       </AnimatePresence>
