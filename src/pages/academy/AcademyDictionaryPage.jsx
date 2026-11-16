@@ -38,7 +38,7 @@ export default function AcademyDictionaryPage() {
       {/* Header */}
       <div className="border-b border-slate-200/80 pb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+          <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
             <FiBook />
           </span>
           <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -58,7 +58,7 @@ export default function AcademyDictionaryPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search glossary terms (e.g. Co-Pay, TPA, Deductible)..."
-          className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00A86B] focus:ring-1 focus:ring-[#00A86B] transition-all shadow-2xs"
+          className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
         />
         {searchQuery && (
           <button
@@ -80,10 +80,10 @@ export default function AcademyDictionaryPage() {
               key={char}
               type="button"
               onClick={() => setSelectedLetter(char)}
-              className={`w-8 h-8 rounded-lg text-xs font-bold shrink-0 transition-all flex items-center justify-center cursor-pointer ${
+              className={`w-8 h-8 rounded-lg text-xs font-bold shrink-0 transition-all flex items-center justify-center cursor-pointer border ${
                 isActive
-                  ? 'bg-[#102A43] text-white shadow-2xs'
-                  : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
+                  ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                  : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xs'
               }`}
             >
               {char}
@@ -98,11 +98,11 @@ export default function AcademyDictionaryPage() {
           {filteredTerms.map((item, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#00A86B]/40 hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col justify-between space-y-3"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-[#00A86B] uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider bg-emerald-100/90 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                     {item.category}
                   </span>
                   <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-500 font-mono text-xs flex items-center justify-center font-bold">
@@ -141,7 +141,7 @@ export default function AcademyDictionaryPage() {
               setSelectedLetter('All');
               setSearchQuery('');
             }}
-            className="px-4 py-2 rounded-xl bg-[#102A43] text-white text-xs font-semibold cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs"
           >
             Show All Terms
           </button>

@@ -69,7 +69,7 @@ export default function AcademySearchBar({ className = '' }) {
     <div ref={searchContainerRef} className={`relative w-full ${className}`}>
       <form onSubmit={handleSubmit} className="relative flex items-center w-full">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none flex items-center">
-          <FiSearch className={isFocused ? 'text-[#00A86B]' : 'text-slate-400'} />
+          <FiSearch className={isFocused ? 'text-emerald-600' : 'text-slate-400'} />
         </div>
         <input
           type="text"
@@ -86,7 +86,7 @@ export default function AcademySearchBar({ className = '' }) {
           placeholder="Search Academy videos, articles, topics and guides..."
           className={`w-full h-11 sm:h-12 pl-11 pr-24 sm:pr-28 rounded-2xl bg-white border text-xs sm:text-sm text-slate-800 placeholder-slate-400 shadow-2xs transition-all duration-200 focus:outline-none ${
             isFocused
-              ? 'border-[#00A86B] ring-2 ring-[#00A86B]/20 shadow-sm'
+              ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm'
               : 'border-slate-200/90 hover:border-slate-300'
           }`}
         />
@@ -106,7 +106,7 @@ export default function AcademySearchBar({ className = '' }) {
           )}
           <button
             type="submit"
-            className="px-3 sm:px-4 py-1.5 rounded-xl bg-[#00A86B] hover:bg-[#008f5b] text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer flex items-center gap-1"
+            className="px-3 sm:px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer flex items-center gap-1"
           >
             <span>Search</span>
           </button>
@@ -138,11 +138,11 @@ export default function AcademySearchBar({ className = '' }) {
                       onClick={() => setDropdownOpen(false)}
                       className="px-4 py-2.5 hover:bg-slate-50/80 flex items-center gap-3 transition-colors group cursor-pointer"
                     >
-                      <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs group-hover:bg-[#00A86B] group-hover:text-white transition-colors">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                         <FiPlay className="text-xs" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h4 className="text-xs sm:text-sm font-semibold text-[#102A43] truncate group-hover:text-[#00A86B] transition-colors">
+                        <h4 className="text-xs sm:text-sm font-semibold text-[#102A43] truncate group-hover:text-emerald-700 transition-colors">
                           {vid.title}
                         </h4>
                         <span className="text-[10px] text-slate-400">
@@ -220,7 +220,7 @@ export default function AcademySearchBar({ className = '' }) {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="text-xs font-bold text-[#00A86B] hover:text-[#008f5b] inline-flex items-center gap-1.5 cursor-pointer py-1"
+                  className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1.5 cursor-pointer py-1"
                 >
                   <span>View all results for "{searchQuery}"</span>
                   <FiArrowRight className="text-xs" />

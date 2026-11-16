@@ -33,7 +33,7 @@ export default function AcademyGuidesPage() {
       {/* Header */}
       <div className="border-b border-slate-200/80 pb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+          <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
             <FiBookOpen />
           </span>
           <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -54,7 +54,7 @@ export default function AcademyGuidesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search guides by title or keyword..."
-            className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00A86B] focus:ring-1 focus:ring-[#00A86B] transition-all shadow-2xs"
+            className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
           />
           {searchQuery && (
             <button
@@ -76,10 +76,10 @@ export default function AcademyGuidesPage() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border ${
                   isActive
-                    ? 'bg-[#102A43] text-white shadow-2xs'
-                    : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                    ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                    : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xs'
                 }`}
               >
                 {cat}
@@ -96,11 +96,11 @@ export default function AcademyGuidesPage() {
             <Link
               key={article.id}
               to={`/insurance-academy/article/${article.slug}`}
-              className="group flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#00A86B]/60 hover:shadow-md transition-all duration-200 text-left space-y-4 cursor-pointer"
+              className="group flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-500/50 hover:shadow-md transition-all duration-200 text-left space-y-4 cursor-pointer"
             >
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                  <span className="text-[#00A86B] font-bold uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded">
+                  <span className="text-emerald-800 font-bold uppercase tracking-wider bg-emerald-100/90 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                     {article.category}
                   </span>
                   <span className="flex items-center gap-1">
@@ -109,7 +109,7 @@ export default function AcademyGuidesPage() {
                   </span>
                 </div>
 
-                <h3 className="text-sm sm:text-base font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors leading-snug">
+                <h3 className="text-sm sm:text-base font-bold text-[#102A43] group-hover:text-emerald-700 transition-colors leading-snug">
                   {article.title}
                 </h3>
 
@@ -136,7 +136,7 @@ export default function AcademyGuidesPage() {
               setSearchQuery('');
               setSelectedCategory('All');
             }}
-            className="px-4 py-2 rounded-xl bg-[#102A43] text-white text-xs font-semibold"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs"
           >
             Show All Articles
           </button>

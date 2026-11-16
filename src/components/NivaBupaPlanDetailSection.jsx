@@ -783,7 +783,7 @@ export default function NivaBupaPlanDetailSection({ plan, company, planId: planI
           <button
             type="button"
             onClick={() => setActiveModal('mustKnow')}
-            className={`bg-white rounded-xl sm:rounded-2xl border p-2.5 sm:p-4 md:p-5 flex items-center justify-between text-left shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.98] select-none ${
+            className={`col-span-1 sm:col-span-2 sm:[grid-column:1/-1] bg-white rounded-xl sm:rounded-2xl border p-2.5 sm:p-4 md:p-5 flex items-center justify-between text-left shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.98] select-none ${
               activeModal === 'mustKnow'
                 ? 'border-[#0EA5E9] ring-2 ring-[#0EA5E9]/20'
                 : 'border-slate-200/80 hover:border-[#0EA5E9]/40'

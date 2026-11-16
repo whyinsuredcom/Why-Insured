@@ -19,7 +19,7 @@ export default function AcademyClaimPage() {
       {/* Header */}
       <div className="border-b border-slate-200/80 pb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+          <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
             <FiShield />
           </span>
           <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -55,11 +55,11 @@ export default function AcademyClaimPage() {
               onClick={() => setSelectedGuideId(guide.id)}
               className={`p-4 rounded-2xl text-left transition-all border cursor-pointer ${
                 isActive
-                  ? 'bg-white border-[#00A86B] shadow-md ring-1 ring-[#00A86B]/20'
+                  ? 'bg-emerald-50/70 border-emerald-500 shadow-sm ring-1 ring-emerald-500/30'
                   : 'bg-white/70 hover:bg-white border-slate-200 text-slate-700'
               }`}
             >
-              <span className="text-[10px] font-bold text-[#00A86B] uppercase tracking-wider block mb-1">
+              <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block mb-1">
                 {guide.category}
               </span>
               <h3 className="text-xs font-bold text-[#102A43] line-clamp-2 leading-snug">
@@ -74,7 +74,7 @@ export default function AcademyClaimPage() {
       <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-6">
         
         <div className="border-b border-slate-100 pb-4 space-y-1.5">
-          <span className="text-xs font-bold text-[#00A86B] uppercase tracking-wider bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full inline-block">
+          <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-100/90 border border-emerald-500/30 px-2.5 py-0.5 rounded-full inline-block">
             {activeGuide.category}
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -139,7 +139,7 @@ export default function AcademyClaimPage() {
                   ? `/insurance-academy/shorts?id=${linkedVideo.id}`
                   : `/insurance-academy/watch/${linkedVideo.id}`
               }
-              className="px-4 py-2 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
             >
               <FiPlay className="text-xs" />
               <span>Watch Video</span>

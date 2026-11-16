@@ -105,7 +105,7 @@ export default function AcademyWatchPage() {
     return (
       <div className="p-8 text-center bg-white rounded-2xl border border-slate-200">
         <h2 className="text-lg font-bold text-[#102A43]">Video Not Found</h2>
-        <Link to="/insurance-academy" className="text-xs font-bold text-[#00A86B] mt-2 inline-block">
+        <Link to="/insurance-academy" className="text-xs font-bold text-emerald-700 hover:text-emerald-800 mt-2 inline-block">
           Return to Academy Home
         </Link>
       </div>
@@ -127,7 +127,7 @@ export default function AcademyWatchPage() {
           {/* 2. Video Title */}
           <div className="space-y-2 pt-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-[#00A86B] uppercase tracking-wider bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider bg-emerald-100/90 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                 {video.category}
               </span>
               <span className="text-xs text-slate-400 font-medium">
@@ -177,8 +177,8 @@ export default function AcademyWatchPage() {
                 onClick={handleSave}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
                   isSaved
-                    ? 'bg-emerald-50 border border-emerald-200 text-[#00A86B]'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                    ? 'bg-emerald-100/90 border border-emerald-500 text-emerald-800'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:text-emerald-700 hover:border-emerald-500/40 hover:bg-emerald-50'
                 }`}
               >
                 {isSaved ? (
@@ -235,7 +235,7 @@ export default function AcademyWatchPage() {
                   {video.chapters.map((chap, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2 text-xs text-slate-700 hover:text-[#00A86B] cursor-pointer transition-colors"
+                      className="flex items-center gap-2 text-xs text-slate-700 hover:text-emerald-700 cursor-pointer transition-colors"
                     >
                       <span className="font-mono text-emerald-600 font-semibold w-10">
                         {chap.time}
@@ -296,7 +296,7 @@ export default function AcademyWatchPage() {
 
               <Link
                 to={`/insurance-academy/article/${relatedArticle.slug}`}
-                className="px-4 py-2 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
               >
                 <span>Read Guide</span>
                 <FiArrowRight className="text-xs" />
@@ -328,7 +328,7 @@ export default function AcademyWatchPage() {
               >
                 {/* 16:9 Mini Thumbnail */}
                 <div className="relative w-36 aspect-video rounded-xl overflow-hidden bg-[#102A43] shrink-0 flex items-center justify-center">
-                  <div className="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center text-xs group-hover:bg-[#00A86B] group-hover:scale-105 transition-all">
+                  <div className="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center text-xs group-hover:bg-emerald-600 group-hover:scale-105 transition-all">
                     <FiPlay className="ml-0.5" />
                   </div>
                   <span className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-black/80 text-white text-[9px] font-mono">
@@ -338,7 +338,7 @@ export default function AcademyWatchPage() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0 space-y-1">
-                  <h4 className="text-xs font-bold text-[#102A43] group-hover:text-[#00A86B] line-clamp-2 leading-snug transition-colors">
+                  <h4 className="text-xs font-bold text-[#102A43] group-hover:text-emerald-700 line-clamp-2 leading-snug transition-colors">
                     {item.title}
                   </h4>
                   <span className="text-[10px] text-slate-400 block truncate">

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiArrowLeft, FiShare2, FiCheck, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiArrowLeft, FiShare2, FiCheck, FiRefreshCw, FiChevronLeft, FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import { companiesData } from '../data/companies';
 import { fetchPublicCompanies, fetchPublicPlan } from '../services/publicApiService';
 import CompareForm from '../components/CompareForm';
-import { getComparisonSections, BENEFIT_CATEGORIES } from '../utils/compareDataHelper';
+import { getComparisonSections, BENEFIT_CATEGORIES, getPlanSupportedCoverages } from '../utils/compareDataHelper';
 import { exportComparisonToPDF } from '../utils/pdfExportHelper';
 
 
@@ -188,7 +188,29 @@ export default function ComparisonPage() {
   const c2 = searchParams.get('c2');
   const p1 = searchParams.get('p1');
   const p2 = searchParams.get('p2');
-  const selectedCoverage = searchParams.get('cov') || '20';
+
+  const rawCov = searchParams.get('cov') || '20';
+  const rawCov1 = searchParams.get('cov1') || rawCov;
+  const rawCov2 = searchParams.get('cov2') || rawCov;
+
+  const [cov1, setCov1] = useState(() => Number(rawCov1) || 20);
+  const [cov2, setCov2] = useState(() => Number(rawCov2) || 20);
+  const [p1CovOpen, setP1CovOpen] = useState(false);
+  const [p2CovOpen, setP2CovOpen] = useState(false);
+
+  // Sync state if URL searchParams change
+  useEffect(() => {
+    if (searchParams.get('cov1')) {
+      setCov1(Number(searchParams.get('cov1')));
+    } else if (searchParams.get('cov')) {
+      setCov1(Number(searchParams.get('cov')));
+    }
+    if (searchParams.get('cov2')) {
+      setCov2(Number(searchParams.get('cov2')));
+    } else if (searchParams.get('cov')) {
+      setCov2(Number(searchParams.get('cov')));
+    }
+  }, [searchParams]);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [exportStatus, setExportStatus] = useState('idle');
@@ -270,6 +292,50 @@ export default function ComparisonPage() {
     return basePlan2;
   }, [basePlan2, dynamicPlan2Data]);
 
+  // Supported coverages for each plan
+  const p1SupportedCoverages = useMemo(() => getPlanSupportedCoverages(plan1), [plan1]);
+  const p2SupportedCoverages = useMemo(() => getPlanSupportedCoverages(plan2), [plan2]);
+
+  // Ensure selected coverages are clamped to supported options
+  useEffect(() => {
+    if (plan1 && p1SupportedCoverages.length > 0) {
+      if (!p1SupportedCoverages.includes(cov1)) {
+        const closest = p1SupportedCoverages.reduce((prev, curr) =>
+          Math.abs(curr - cov1) < Math.abs(prev - cov1) ? curr : prev
+        , p1SupportedCoverages[0]);
+        setCov1(closest);
+      }
+    }
+  }, [plan1, p1SupportedCoverages]);
+
+  useEffect(() => {
+    if (plan2 && p2SupportedCoverages.length > 0) {
+      if (!p2SupportedCoverages.includes(cov2)) {
+        const closest = p2SupportedCoverages.reduce((prev, curr) =>
+          Math.abs(curr - cov2) < Math.abs(prev - cov2) ? curr : prev
+        , p2SupportedCoverages[0]);
+        setCov2(closest);
+      }
+    }
+  }, [plan2, p2SupportedCoverages]);
+
+  const handleUpdateCov1 = (newCov) => {
+    setCov1(newCov);
+    setP1CovOpen(false);
+    const params = new URLSearchParams(searchParams);
+    params.set('cov1', newCov.toString());
+    params.set('cov', newCov.toString());
+    navigate(`?${params.toString()}`, { replace: true });
+  };
+
+  const handleUpdateCov2 = (newCov) => {
+    setCov2(newCov);
+    setP2CovOpen(false);
+    const params = new URLSearchParams(searchParams);
+    params.set('cov2', newCov.toString());
+    navigate(`?${params.toString()}`, { replace: true });
+  };
+
   const hasValidParams = company1 && company2 && plan1 && plan2;
 
   const comparisonSections = useMemo(() => {
@@ -279,9 +345,11 @@ export default function ComparisonPage() {
       plan1,
       company1,
       plan2,
-      company2
+      company2,
+      cov1,
+      cov2
     );
-  }, [hasValidParams, plan1, company1, plan2, company2]);
+  }, [hasValidParams, plan1, company1, plan2, company2, cov1, cov2]);
 
   const filteredSections = useMemo(() => {
     const cat = BENEFIT_CATEGORIES.find(
@@ -360,6 +428,9 @@ export default function ComparisonPage() {
               initialCompany2Id={c2}
               initialPlan1Id={p1}
               initialPlan2Id={p2}
+              initialCoverage1={cov1}
+              initialCoverage2={cov2}
+              initialCoverage={rawCov}
             />
           </div>
         </div>
@@ -448,10 +519,62 @@ export default function ComparisonPage() {
                 </h2>
               </div>
             </div>
-            <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-slate-100/80 flex flex-col items-center gap-2">
-              <span className="text-xs sm:text-base lg:text-lg font-black text-emerald-600 block uppercase tracking-wider animate-fade-in">
-                ₹{selectedCoverage} Lakh Coverage
-              </span>
+            <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-slate-100/80 flex flex-col items-center gap-2 w-full">
+              {/* Desktop: Plan 1 Independent Coverage Selector */}
+              <div className="hidden lg:block relative w-full max-w-[240px]">
+                <span className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 text-center">
+                  Plan 1 – Select Coverage
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setP1CovOpen(!p1CovOpen);
+                    setP2CovOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3.5 py-2 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200/80 hover:border-emerald-300 rounded-xl text-xs font-black text-emerald-800 transition-all cursor-pointer shadow-2xs"
+                >
+                  <span className="truncate">
+                    {cov1 >= 100 ? `₹${cov1 / 100} Crore` : `₹${cov1} Lakh`} Coverage
+                  </span>
+                  <FiChevronDown className={`text-emerald-700 text-xs transition-transform duration-200 shrink-0 ml-1.5 ${p1CovOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {p1CovOpen && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setP1CovOpen(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-40 max-h-48 overflow-y-auto py-1 text-left"
+                      >
+                        {p1SupportedCoverages.map((cov) => (
+                          <button
+                            key={cov}
+                            type="button"
+                            onClick={() => handleUpdateCov1(cov)}
+                            className={`w-full px-3 py-1.5 text-left text-xs font-bold transition-colors ${
+                              cov === cov1 ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50'
+                            }`}
+                          >
+                            {cov >= 100 ? `₹${cov / 100} Crore` : `₹${cov} Lakh`} Coverage
+                          </button>
+                        ))}
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Tablet & Mobile: Preserved display */}
+              <div className="lg:hidden text-center">
+                <span className="text-xs sm:text-base font-black text-emerald-600 block uppercase tracking-wider animate-fade-in">
+                  {cov1 >= 100 ? `₹${cov1 / 100} Crore` : `₹${cov1} Lakh`} Coverage
+                </span>
+              </div>
+
               <button
                 type="button"
                 onClick={() => navigate('/compare')}
@@ -489,10 +612,62 @@ export default function ComparisonPage() {
                 </h2>
               </div>
             </div>
-            <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-slate-100/80 flex flex-col items-center gap-2">
-              <span className="text-xs sm:text-base lg:text-lg font-black text-emerald-600 block uppercase tracking-wider animate-fade-in">
-                ₹{selectedCoverage} Lakh Coverage
-              </span>
+            <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-slate-100/80 flex flex-col items-center gap-2 w-full">
+              {/* Desktop: Plan 2 Independent Coverage Selector */}
+              <div className="hidden lg:block relative w-full max-w-[240px]">
+                <span className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 text-center">
+                  Plan 2 – Select Coverage
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setP2CovOpen(!p2CovOpen);
+                    setP1CovOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3.5 py-2 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200/80 hover:border-emerald-300 rounded-xl text-xs font-black text-emerald-800 transition-all cursor-pointer shadow-2xs"
+                >
+                  <span className="truncate">
+                    {cov2 >= 100 ? `₹${cov2 / 100} Crore` : `₹${cov2} Lakh`} Coverage
+                  </span>
+                  <FiChevronDown className={`text-emerald-700 text-xs transition-transform duration-200 shrink-0 ml-1.5 ${p2CovOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {p2CovOpen && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setP2CovOpen(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-40 max-h-48 overflow-y-auto py-1 text-left"
+                      >
+                        {p2SupportedCoverages.map((cov) => (
+                          <button
+                            key={cov}
+                            type="button"
+                            onClick={() => handleUpdateCov2(cov)}
+                            className={`w-full px-3 py-1.5 text-left text-xs font-bold transition-colors ${
+                              cov === cov2 ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50'
+                            }`}
+                          >
+                            {cov >= 100 ? `₹${cov / 100} Crore` : `₹${cov} Lakh`} Coverage
+                          </button>
+                        ))}
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Tablet & Mobile: Preserved display */}
+              <div className="lg:hidden text-center">
+                <span className="text-xs sm:text-base font-black text-emerald-600 block uppercase tracking-wider animate-fade-in">
+                  {cov2 >= 100 ? `₹${cov2 / 100} Crore` : `₹${cov2} Lakh`} Coverage
+                </span>
+              </div>
+
               <button
                 type="button"
                 onClick={() => navigate('/compare')}

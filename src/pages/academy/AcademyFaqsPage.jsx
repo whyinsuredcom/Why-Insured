@@ -39,7 +39,7 @@ export default function AcademyFaqsPage() {
       {/* Header */}
       <div className="border-b border-slate-200/80 pb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+          <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
             <FiHelpCircle />
           </span>
           <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -60,7 +60,7 @@ export default function AcademyFaqsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions by keyword (e.g. pre-existing disease, claim rejection, NCB)..."
-            className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00A86B] focus:ring-1 focus:ring-[#00A86B] transition-all shadow-2xs"
+            className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
           />
           {searchQuery && (
             <button
@@ -80,10 +80,10 @@ export default function AcademyFaqsPage() {
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border ${
                 selectedCategory === cat
-                  ? 'bg-[#102A43] text-white shadow-2xs'
-                  : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                  ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                  : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xs'
               }`}
             >
               {cat}
@@ -108,7 +108,7 @@ export default function AcademyFaqsPage() {
                   className="w-full p-4 sm:p-5 flex items-center justify-between gap-4 text-left hover:bg-slate-50/50 cursor-pointer transition-colors"
                 >
                   <div className="space-y-1 flex-1 pr-2">
-                    <span className="text-[10px] font-bold text-[#00A86B] uppercase tracking-wider block">
+                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
                       {faq.category}
                     </span>
                     <h3 className="text-xs sm:text-sm font-bold text-[#102A43]">
@@ -118,7 +118,7 @@ export default function AcademyFaqsPage() {
 
                   <div
                     className={`w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 bg-emerald-50 text-[#00A86B]' : ''
+                      isOpen ? 'rotate-180 bg-emerald-100/80 text-emerald-700' : ''
                     }`}
                   >
                     <FiChevronDown className="text-sm" />

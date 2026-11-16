@@ -67,10 +67,10 @@ export default function AcademyLibraryPage() {
         <button
           type="button"
           onClick={() => setActiveTab('watch-later')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'watch-later'
-              ? 'bg-[#102A43] text-white shadow-2xs'
-              : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
+              ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+              : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xs'
           }`}
         >
           <FiClock className="text-sm" />
@@ -80,10 +80,10 @@ export default function AcademyLibraryPage() {
         <button
           type="button"
           onClick={() => setActiveTab('saved')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'saved'
-              ? 'bg-[#102A43] text-white shadow-2xs'
-              : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
+              ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+              : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xs'
           }`}
         >
           <FiBookmark className="text-sm" />
@@ -106,7 +106,7 @@ export default function AcademyLibraryPage() {
                 return (
                   <div
                     key={item.videoId}
-                    className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-[#00A86B]/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-500/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
@@ -125,7 +125,7 @@ export default function AcademyLibraryPage() {
                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                       <Link
                         to={playUrl}
-                        className="px-3.5 py-1.5 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                       >
                         <FiPlay className="text-xs" />
                         <span>Watch</span>
@@ -157,7 +157,7 @@ export default function AcademyLibraryPage() {
               </p>
               <Link
                 to="/insurance-academy/videos"
-                className="inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-[#00A86B] text-white text-xs font-bold transition-all shadow-xs"
+                className="inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs"
               >
                 <span>Browse Videos</span>
                 <FiArrowRight className="text-xs" />
@@ -175,7 +175,7 @@ export default function AcademyLibraryPage() {
               {savedItems.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-[#00A86B]/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-500/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0">
@@ -217,7 +217,7 @@ export default function AcademyLibraryPage() {
               </p>
               <Link
                 to="/insurance-academy/guides"
-                className="inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-[#00A86B] text-white text-xs font-bold transition-all shadow-xs"
+                className="inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs"
               >
                 <span>Browse Guides</span>
                 <FiArrowRight className="text-xs" />

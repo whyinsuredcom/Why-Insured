@@ -88,11 +88,11 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
             to="/insurance-academy"
             className="flex items-center gap-2 group cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#00A86B] to-[#0FA26E] text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
               <FiShield className="text-base" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm sm:text-base font-extrabold text-[#102A43] font-display tracking-tight leading-none group-hover:text-[#00A86B] transition-colors">
+              <span className="text-sm sm:text-base font-extrabold text-[#102A43] font-display tracking-tight leading-none group-hover:text-emerald-700 transition-colors">
                 WHYINSURED
               </span>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600 leading-none mt-0.5">
@@ -122,7 +122,7 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
                 placeholder="Search insurance videos, topics, guides, terms..."
                 className={`w-full py-2 pl-4 pr-10 rounded-l-full bg-slate-50 border text-xs sm:text-sm text-[#17212B] placeholder-slate-400 focus:outline-none transition-all ${
                   isSearchFocused
-                    ? 'border-[#00A86B] bg-white ring-2 ring-[#00A86B]/15'
+                    ? 'border-emerald-500 bg-white ring-2 ring-emerald-500/20'
                     : 'border-slate-300/80 hover:border-slate-400'
                 }`}
               />
@@ -270,7 +270,7 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <Link
             to="/insurance-academy/watch-later"
-            className="p-2 rounded-xl text-slate-600 hover:text-[#00A86B] hover:bg-slate-100 transition-colors cursor-pointer relative"
+            className="p-2 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors cursor-pointer relative"
             title="Watch Later"
           >
             <FiClock className="text-lg" />
@@ -278,7 +278,7 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
 
           <Link
             to="/insurance-academy/saved"
-            className="p-2 rounded-xl text-slate-600 hover:text-[#00A86B] hover:bg-slate-100 transition-colors cursor-pointer relative"
+            className="p-2 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors cursor-pointer relative"
             title="Saved Videos & Articles"
           >
             <FiBookmark className="text-lg" />

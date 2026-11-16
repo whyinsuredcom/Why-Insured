@@ -32,7 +32,7 @@ export default function AcademyArticleDetailPage() {
     return (
       <div className="p-8 text-center bg-white rounded-2xl border border-slate-200">
         <h2 className="text-lg font-bold text-[#102A43]">Article Not Found</h2>
-        <Link to="/insurance-academy/guides" className="text-xs font-bold text-[#00A86B] mt-2 inline-block">
+        <Link to="/insurance-academy/guides" className="text-xs font-bold text-emerald-700 hover:text-emerald-800 mt-2 inline-block">
           Return to Guides
         </Link>
       </div>
@@ -46,7 +46,7 @@ export default function AcademyArticleDetailPage() {
       <div>
         <Link
           to="/insurance-academy/guides"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#00A86B] transition-colors group"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-emerald-700 transition-colors group"
         >
           <FiArrowLeft className="text-xs group-hover:-translate-x-1 transition-transform" />
           <span>Back to All Insurance Guides</span>
@@ -56,7 +56,7 @@ export default function AcademyArticleDetailPage() {
       {/* Article Header */}
       <header className="space-y-3 border-b border-slate-200/80 pb-6">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-[#00A86B] uppercase tracking-wider bg-emerald-50 border border-emerald-200/60 px-3 py-0.5 rounded-full">
+          <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-100/90 border border-emerald-500/30 px-3 py-0.5 rounded-full">
             {article.category}
           </span>
           <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
@@ -74,7 +74,7 @@ export default function AcademyArticleDetailPage() {
           {article.title}
         </h1>
 
-        <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed italic border-l-3 border-[#00A86B] pl-3 py-0.5">
+        <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed italic border-l-4 border-emerald-500 pl-3 py-0.5">
           {article.excerpt}
         </p>
 
@@ -203,7 +203,7 @@ export default function AcademyArticleDetailPage() {
                 ? `/insurance-academy/shorts?id=${linkedVideo.id}`
                 : `/insurance-academy/watch/${linkedVideo.id}`
             }
-            className="px-4 py-2 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
           >
             <FiPlay className="text-xs" />
             <span>Watch Video</span>
@@ -221,9 +221,9 @@ export default function AcademyArticleDetailPage() {
             <Link
               key={other.id}
               to={`/insurance-academy/article/${other.slug}`}
-              className="p-4 rounded-xl bg-white border border-slate-200 hover:border-[#00A86B]/50 transition-all space-y-1.5 text-left"
+              className="p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-500/50 transition-all space-y-1.5 text-left"
             >
-              <span className="text-[10px] font-bold text-emerald-600 uppercase">
+              <span className="text-[10px] font-bold text-emerald-700 uppercase">
                 {other.category}
               </span>
               <h4 className="text-xs font-bold text-[#102A43] line-clamp-2">

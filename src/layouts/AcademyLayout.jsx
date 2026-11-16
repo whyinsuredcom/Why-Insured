@@ -24,7 +24,7 @@ export default function AcademyLayout() {
             onClick={() => setMobileSidebarOpen(true)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 cursor-pointer"
           >
-            <FiMenu className="text-sm text-[#00A86B]" />
+            <FiMenu className="text-sm text-emerald-600" />
             <span>Academy Menu</span>
           </button>
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">

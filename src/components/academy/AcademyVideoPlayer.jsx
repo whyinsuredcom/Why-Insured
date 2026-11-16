@@ -172,7 +172,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
             onClick={togglePlay}
             className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-2xs transition-opacity cursor-pointer z-10"
           >
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#00A86B] hover:bg-[#0FA26E] text-white flex items-center justify-center shadow-2xl transition-transform hover:scale-110">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-2xl transition-transform hover:scale-110">
               <FiPlay className="text-2xl sm:text-3xl ml-1" />
             </div>
           </button>
@@ -192,7 +192,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
               max={duration || 100}
               value={currentTime}
               onChange={handleSeek}
-              className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-[#00A86B] focus:outline-none"
+              className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -203,7 +203,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
               <button
                 type="button"
                 onClick={togglePlay}
-                className="hover:text-[#00A86B] transition-colors p-1"
+                className="hover:text-emerald-400 transition-colors p-1"
                 title={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? <FiPause className="text-lg" /> : <FiPlay className="text-lg" />}
@@ -212,7 +212,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
               <button
                 type="button"
                 onClick={restartVideo}
-                className="hover:text-[#00A86B] transition-colors p-1"
+                className="hover:text-emerald-400 transition-colors p-1"
                 title="Restart"
               >
                 <FiRotateCcw className="text-base" />
@@ -229,7 +229,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
                 <button
                   type="button"
                   onClick={toggleMute}
-                  className="hover:text-[#00A86B] transition-colors"
+                  className="hover:text-emerald-400 transition-colors"
                   title={isMuted ? 'Unmute' : 'Mute'}
                 >
                   {isMuted || volume === 0 ? (
@@ -264,7 +264,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
               <button
                 type="button"
                 onClick={toggleFullscreen}
-                className="hover:text-[#00A86B] transition-colors p-1"
+                className="hover:text-emerald-400 transition-colors p-1"
                 title="Toggle Fullscreen"
               >
                 {isFullscreen ? <FiMinimize className="text-lg" /> : <FiMaximize className="text-lg" />}
@@ -295,7 +295,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
   return (
     <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#0C1E38] via-[#102A43] to-[#0A192F] text-white p-6 sm:p-8 flex flex-col justify-between shadow-2xl border border-slate-800 select-none">
       {/* Decorative Radial Backdrop */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#00A86B_0%,transparent_60%)] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#10b981_0%,transparent_60%)] opacity-20 pointer-events-none" />
 
       {/* Top Banner */}
       <div className="flex items-center justify-between z-10">
@@ -313,7 +313,7 @@ export default function AcademyVideoPlayer({ video, onTimeUpdate = () => {} }) {
 
       {/* Center Topic Overview */}
       <div className="max-w-2xl my-auto z-10 space-y-3 text-left">
-        <div className="w-12 h-12 rounded-2xl bg-[#00A86B]/20 border border-[#00A86B]/40 text-[#00A86B] flex items-center justify-center text-xl shadow-lg">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xl shadow-lg">
           <FiShield />
         </div>
         <h2 className="text-lg sm:text-2xl font-bold font-display text-white leading-tight">

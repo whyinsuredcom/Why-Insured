@@ -894,7 +894,7 @@ export default function ManipalCignaPlanDetailSection({ plan, company, planId: p
           <button
             type="button"
             onClick={() => setActiveModal('mustKnow')}
-            className={`bg-white rounded-xl sm:rounded-2xl border border-[#F8971F]/35 p-2.5 sm:p-5 flex items-center justify-between text-left shadow-2xs hover:shadow-md hover:border-[#F8971F] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.98] select-none ring-1 ring-[#F8971F]/10 hover:ring-[#F8971F]/25 `}
+            className={`col-span-1 sm:col-span-2 sm:[grid-column:1/-1] bg-white rounded-xl sm:rounded-2xl border border-[#F8971F]/35 p-2.5 sm:p-5 flex items-center justify-between text-left shadow-2xs hover:shadow-md hover:border-[#F8971F] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.98] select-none ring-1 ring-[#F8971F]/10 hover:ring-[#F8971F]/25 `}
           >
             <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#F8971F] transition-colors duration-200" />
             <div className="flex items-center gap-1.5 sm:gap-2.5 relative z-10 min-w-0 pr-1">

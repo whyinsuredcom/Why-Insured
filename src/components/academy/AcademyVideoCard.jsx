@@ -110,7 +110,7 @@ export default function AcademyVideoCard({ video, showProgress = true }) {
         ) : (
           /* Authentic WHYINSURED Video Poster Placeholder */
           <div className="w-full h-full p-3.5 flex flex-col justify-between relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#00A86B_0%,transparent_60%)] opacity-25 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#10b981_0%,transparent_60%)] opacity-25 pointer-events-none" />
 
             {/* Top Row: Category Pill */}
             <div className="flex items-center justify-between z-10">
@@ -124,7 +124,7 @@ export default function AcademyVideoCard({ video, showProgress = true }) {
 
             {/* Center: Play Circle */}
             <div className="flex items-center justify-center my-auto z-10">
-              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-xs border border-white/30 text-white flex items-center justify-center group-hover:bg-[#00A86B] group-hover:scale-110 group-hover:border-transparent transition-all duration-200 shadow-lg">
+              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-xs border border-white/30 text-white flex items-center justify-center group-hover:bg-emerald-600 group-hover:scale-110 group-hover:border-transparent transition-all duration-200 shadow-lg">
                 <FiPlay className="text-sm ml-0.5" />
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function AcademyVideoCard({ video, showProgress = true }) {
 
         {/* Details Column */}
         <div className="flex-1 min-w-0 space-y-1">
-          <h3 className="text-xs sm:text-sm font-bold text-[#102A43] group-hover:text-[#00A86B] line-clamp-2 leading-snug transition-colors">
+          <h3 className="text-xs sm:text-sm font-bold text-[#102A43] group-hover:text-emerald-700 line-clamp-2 leading-snug transition-colors">
             {video.title}
           </h3>
 
@@ -211,7 +211,7 @@ export default function AcademyVideoCard({ video, showProgress = true }) {
               <button
                 type="button"
                 onClick={handleWatchLaterClick}
-                className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-2 text-slate-700 hover:text-[#00A86B] transition-colors cursor-pointer font-medium"
+                className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-2 text-slate-700 hover:text-emerald-700 transition-colors cursor-pointer font-medium"
               >
                 {inWatchLater ? (
                   <>
@@ -229,7 +229,7 @@ export default function AcademyVideoCard({ video, showProgress = true }) {
               <button
                 type="button"
                 onClick={handleShareClick}
-                className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-2 text-slate-700 hover:text-[#00A86B] transition-colors cursor-pointer font-medium"
+                className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-2 text-slate-700 hover:text-emerald-700 transition-colors cursor-pointer font-medium"
               >
                 {copied ? (
                   <>

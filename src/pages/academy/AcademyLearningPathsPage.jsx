@@ -34,7 +34,7 @@ export default function AcademyLearningPathsPage() {
       {/* Header */}
       <div className="border-b border-slate-200/80 pb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+          <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
             <FiAward />
           </span>
           <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -66,7 +66,7 @@ export default function AcademyLearningPathsPage() {
                     <span
                       className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                         path.level === 'Beginner'
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                          ? 'bg-emerald-100/90 text-emerald-800 border border-emerald-500/30'
                           : path.level === 'Intermediate'
                           ? 'bg-blue-50 text-blue-800 border border-blue-200'
                           : 'bg-purple-50 text-purple-800 border border-purple-200'
@@ -96,7 +96,7 @@ export default function AcademyLearningPathsPage() {
                   </div>
                   <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
                     <div
-                      className="h-full bg-[#00A86B] rounded-full transition-all duration-500"
+                      className="h-full bg-emerald-600 rounded-full transition-all duration-500"
                       style={{ width: `${percent}%` }}
                     />
                   </div>
@@ -132,8 +132,8 @@ export default function AcademyLearningPathsPage() {
                             onClick={() => handleToggle(path.id, lesson.id)}
                             className={`w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 cursor-pointer transition-colors ${
                               isDone
-                                ? 'bg-[#00A86B] border-[#00A86B] text-white shadow-2xs'
-                                : 'bg-white border-slate-300 hover:border-[#00A86B] text-transparent'
+                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-2xs'
+                                : 'bg-white border-slate-300 hover:border-emerald-500 text-transparent'
                             }`}
                             title={isDone ? 'Mark as incomplete' : 'Mark as complete'}
                           >
@@ -159,7 +159,7 @@ export default function AcademyLearningPathsPage() {
                         {lesson.videoId && (
                           <Link
                             to={`/insurance-academy/watch/${lesson.videoId}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs font-bold text-[#102A43] hover:text-[#00A86B] transition-colors shrink-0 self-start sm:self-auto cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 hover:border-emerald-500/50 text-xs font-bold text-[#102A43] hover:text-emerald-700 transition-colors shrink-0 self-start sm:self-auto cursor-pointer"
                           >
                             <FiPlay className="text-xs text-emerald-600" />
                             <span>Start Lesson</span>

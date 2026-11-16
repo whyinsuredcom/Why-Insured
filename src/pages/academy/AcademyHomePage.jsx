@@ -148,10 +148,10 @@ export default function AcademyHomePage() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer select-none ${
+                className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all duration-200 cursor-pointer select-none border ${
                   isActive
-                    ? 'bg-[#102A43] text-white shadow-xs'
-                    : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                    ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                    : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:shadow-xs'
                 }`}
               >
                 {cat}
@@ -168,7 +168,7 @@ export default function AcademyHomePage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <FiRotateCcw className="text-[#00A86B] text-lg" />
+              <FiRotateCcw className="text-emerald-600 text-lg" />
               <h2 className="text-base sm:text-lg font-bold text-[#102A43] font-display">
                 Continue Learning
               </h2>
@@ -209,7 +209,7 @@ export default function AcademyHomePage() {
       <section className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-red-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+            <span className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-600 to-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">
               <FiZap />
             </span>
             <h2 className="text-base sm:text-lg font-bold text-[#102A43] font-display">
@@ -222,7 +222,7 @@ export default function AcademyHomePage() {
 
           <Link
             to="/insurance-academy/shorts"
-            className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
           >
             <span>View All Shorts</span>
             <FiArrowRight className="text-xs" />
@@ -253,7 +253,7 @@ export default function AcademyHomePage() {
 
           <Link
             to="/insurance-academy/videos"
-            className="text-xs font-bold text-[#00A86B] hover:text-[#0FA26E] flex items-center gap-1 shrink-0 cursor-pointer"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 shrink-0 cursor-pointer"
           >
             <span>Browse Library</span>
             <FiArrowRight className="text-xs" />
@@ -291,7 +291,7 @@ export default function AcademyHomePage() {
 
           <Link
             to="/insurance-academy/videos"
-            className="text-xs font-bold text-[#00A86B] hover:text-[#0FA26E] flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
           >
             <span>View All Long Videos</span>
             <FiArrowRight className="text-xs" />
@@ -311,7 +311,7 @@ export default function AcademyHomePage() {
       <section className="space-y-4 pt-4 border-t border-slate-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+            <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
               <FiFileText />
             </span>
             <div>
@@ -326,7 +326,7 @@ export default function AcademyHomePage() {
 
           <Link
             to="/insurance-academy/policy-explained"
-            className="text-xs font-bold text-[#00A86B] hover:text-[#0FA26E] flex items-center gap-1 shrink-0 cursor-pointer"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 shrink-0 cursor-pointer"
           >
             <span>Explore All Clauses</span>
             <FiArrowRight className="text-xs" />
@@ -338,16 +338,16 @@ export default function AcademyHomePage() {
             <Link
               key={topic.id}
               to="/insurance-academy/policy-explained"
-              className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#00A86B]/60 hover:shadow-md transition-all flex flex-col justify-between space-y-3 cursor-pointer text-left group"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col justify-between space-y-3 cursor-pointer text-left group"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
                     {topic.badge}
                   </span>
-                  <FiArrowRight className="text-xs text-slate-300 group-hover:text-[#00A86B] group-hover:translate-x-1 transition-all" />
+                  <FiArrowRight className="text-xs text-slate-300 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all" />
                 </div>
-                <h3 className="text-sm font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors leading-snug">
+                <h3 className="text-sm font-bold text-[#102A43] group-hover:text-emerald-700 transition-colors leading-snug">
                   {topic.title}
                 </h3>
                 <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
@@ -370,7 +370,7 @@ export default function AcademyHomePage() {
       <section className="space-y-4 pt-4 border-t border-slate-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+            <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
               <FiShield />
             </span>
             <div>
@@ -385,7 +385,7 @@ export default function AcademyHomePage() {
 
           <Link
             to="/insurance-academy/claim-academy"
-            className="text-xs font-bold text-[#00A86B] hover:text-[#0FA26E] flex items-center gap-1 shrink-0 cursor-pointer"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 shrink-0 cursor-pointer"
           >
             <span>View Claim Guides</span>
             <FiArrowRight className="text-xs" />
@@ -397,13 +397,13 @@ export default function AcademyHomePage() {
             <Link
               key={guide.id}
               to="/insurance-academy/claim-academy"
-              className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#00A86B]/60 hover:shadow-md transition-all flex flex-col justify-between space-y-3 cursor-pointer text-left group"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col justify-between space-y-3 cursor-pointer text-left group"
             >
               <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#00A86B] block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block">
                   {guide.category}
                 </span>
-                <h3 className="text-sm font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors leading-snug">
+                <h3 className="text-sm font-bold text-[#102A43] group-hover:text-emerald-700 transition-colors leading-snug">
                   {guide.title}
                 </h3>
                 <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
@@ -426,7 +426,7 @@ export default function AcademyHomePage() {
       <section className="space-y-4 pt-4 border-t border-slate-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FiBookOpen className="text-[#00A86B] text-lg" />
+            <FiBookOpen className="text-emerald-600 text-lg" />
             <h2 className="text-base sm:text-lg font-bold text-[#102A43] font-display">
               Latest Insurance Guides
             </h2>
@@ -434,7 +434,7 @@ export default function AcademyHomePage() {
 
           <Link
             to="/insurance-academy/guides"
-            className="text-xs font-bold text-[#00A86B] hover:text-[#0FA26E] flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
           >
             <span>Read All Guides</span>
             <FiArrowRight className="text-xs" />
@@ -446,17 +446,17 @@ export default function AcademyHomePage() {
             <Link
               key={article.id}
               to={`/insurance-academy/article/${article.slug}`}
-              className="group p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#00A86B]/60 hover:shadow-md transition-all duration-200 flex flex-col justify-between text-left space-y-3 cursor-pointer"
+              className="group p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-500/50 hover:shadow-md transition-all duration-200 flex flex-col justify-between text-left space-y-3 cursor-pointer"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                  <span className="text-[#00A86B] font-bold uppercase tracking-wider">
+                  <span className="text-emerald-700 font-bold uppercase tracking-wider">
                     {article.category}
                   </span>
                   <span>{article.readingTime}</span>
                 </div>
 
-                <h3 className="text-sm font-bold text-[#102A43] group-hover:text-[#00A86B] transition-colors leading-snug">
+                <h3 className="text-sm font-bold text-[#102A43] group-hover:text-emerald-700 transition-colors leading-snug">
                   {article.title}
                 </h3>
 

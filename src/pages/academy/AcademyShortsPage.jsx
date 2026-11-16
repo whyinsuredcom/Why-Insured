@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   FiChevronUp,
@@ -8,8 +8,10 @@ import {
   FiShare2,
   FiCheck,
   FiPlay,
+  FiPause,
   FiZap,
-  FiArrowLeft
+  FiArrowLeft,
+  FiShield
 } from 'react-icons/fi';
 import { ACADEMY_VIDEOS } from '../../data/academyData';
 import {
@@ -32,11 +34,23 @@ export default function AcademyShortsPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
+  const videoRef = useRef(null);
+  const touchStartY = useRef(null);
+  const touchEndY = useRef(null);
+  const lastWheelTime = useRef(0);
+
+  // Sync like and saved states when current short changes
   useEffect(() => {
     if (!currentShort) return;
     setIsLiked(isVideoLiked(currentShort.id));
     setIsSaved(isWatchLater(currentShort.id));
+    setIsPlaying(true);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {});
+    }
   }, [currentShort]);
 
   const handleNext = useCallback(() => {
@@ -68,6 +82,42 @@ export default function AcademyShortsPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleNext, handlePrev]);
 
+  // Mouse wheel navigation with debounce
+  const handleWheel = (e) => {
+    const now = Date.now();
+    if (now - lastWheelTime.current < 500) return;
+    if (e.deltaY > 35) {
+      lastWheelTime.current = now;
+      handleNext();
+    } else if (e.deltaY < -35) {
+      lastWheelTime.current = now;
+      handlePrev();
+    }
+  };
+
+  // Touch swipe navigation for mobile
+  const handleTouchStart = (e) => {
+    touchStartY.current = e.targetTouches[0].clientY;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndY.current = e.targetTouches[0].clientY;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartY.current || !touchEndY.current) return;
+    const distance = touchStartY.current - touchEndY.current;
+    if (distance > 50) {
+      // Swiped UP -> Next Short
+      handleNext();
+    } else if (distance < -50) {
+      // Swiped DOWN -> Prev Short
+      handlePrev();
+    }
+    touchStartY.current = null;
+    touchEndY.current = null;
+  };
+
   const handleLike = () => {
     if (!currentShort) return;
     const next = toggleLikeVideo(currentShort.id);
@@ -91,6 +141,20 @@ export default function AcademyShortsPage() {
     }
   };
 
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
+    } else {
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   if (!currentShort) {
     return (
       <div className="p-8 text-center bg-white rounded-2xl border border-slate-200">
@@ -102,28 +166,32 @@ export default function AcademyShortsPage() {
   return (
     <div className="max-w-4xl mx-auto py-2 sm:py-4 select-none">
       
-      {/* Top Header Row with Topic Pills */}
+      {/* ===================================================================
+          1. TOP HEADER ROW WITH TOPIC PILLS (ACADEMY THEME)
+      =================================================================== */}
       <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <Link
             to="/insurance-academy"
-            className="p-1.5 rounded-xl hover:bg-slate-200 text-slate-600 transition-colors"
+            className="p-1.5 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-colors cursor-pointer"
             title="Back to Academy"
           >
             <FiArrowLeft className="text-lg" />
           </Link>
-          <span className="w-6 h-6 rounded-lg bg-red-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">
             <FiZap />
-          </span>
-          <h1 className="text-lg font-bold text-[#102A43] font-display">
-            Insurance Shorts
-          </h1>
-          <span className="text-xs text-slate-400 font-medium">
-            ({currentIndex + 1} of {allShorts.length})
-          </span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-lg sm:text-xl font-bold text-[#102A43] font-display">
+              Insurance Shorts
+            </h1>
+            <span className="text-xs text-slate-400 font-medium">
+              ({currentIndex + 1} of {allShorts.length})
+            </span>
+          </div>
         </div>
 
-        {/* Quick Topic Chips */}
+        {/* Quick Topic Chips Styled with Academy Theme */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
           {allShorts.map((short, idx) => (
             <button
@@ -133,10 +201,10 @@ export default function AcademyShortsPage() {
                 setCurrentIndex(idx);
                 setSearchParams({ id: short.id });
               }}
-              className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                 idx === currentIndex
-                  ? 'bg-red-600 text-white shadow-xs'
-                  : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
+                  ? 'border border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-xs'
+                  : 'border border-emerald-500/25 bg-emerald-50/50 text-slate-700 hover:bg-emerald-100/70 hover:text-emerald-800 hover:border-emerald-500/40'
               }`}
             >
               {short.topic || `Short ${idx + 1}`}
@@ -145,91 +213,134 @@ export default function AcademyShortsPage() {
         </div>
       </div>
 
-      {/* Main Shorts Container: Player (9:16) + Floating Right Action Sidebar */}
-      <div className="relative flex items-center justify-center gap-4 sm:gap-6 min-h-[620px]">
+      {/* ===================================================================
+          2. MAIN SHORTS CONTAINER: 9:16 PLAYER + ACTION CONTROLS
+      =================================================================== */}
+      <div className="relative flex items-center justify-center gap-4 sm:gap-6 min-h-[580px] sm:min-h-[640px]">
         
         {/* 9:16 Vertical Video Screen */}
-        <div className="relative w-full max-w-[360px] sm:max-w-[380px] aspect-[9/16] rounded-3xl overflow-hidden bg-gradient-to-b from-[#0C1E38] via-[#102A43] to-[#0A192F] shadow-2xl border border-slate-800 flex flex-col justify-between p-5 text-white">
-          
-          {/* Subtle Accent Glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#EF4444_0%,transparent_60%)] opacity-25 pointer-events-none" />
+        <div
+          onWheel={handleWheel}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[9/16] rounded-3xl overflow-hidden bg-gradient-to-b from-[#0C1E38] via-[#102A43] to-[#0A192F] shadow-2xl border border-slate-800/80 flex flex-col justify-between p-4 sm:p-5 text-white select-none transition-all duration-300"
+        >
+          {/* Subtle Emerald Mesh Background Accent */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#10B981_0%,transparent_60%)] opacity-25 pointer-events-none" />
+
+          {/* Actual Video Element if videoUrl exists */}
+          {currentShort.videoUrl && (
+            <video
+              ref={videoRef}
+              src={currentShort.videoUrl}
+              playsInline
+              loop
+              autoPlay
+              onClick={togglePlay}
+              className="absolute inset-0 w-full h-full object-cover cursor-pointer z-0"
+            />
+          )}
+
+          {/* YouTube Embed if youtubeId exists */}
+          {currentShort.youtubeId && (
+            <iframe
+              src={`https://www.youtube.com/embed/${currentShort.youtubeId}?autoplay=1&rel=0&controls=0`}
+              title={currentShort.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full border-0 object-cover z-0"
+            />
+          )}
 
           {/* Top Bar inside Player */}
           <div className="flex items-center justify-between z-10">
-            <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-white bg-red-600 px-2 py-0.5 rounded-full shadow-xs tracking-wider">
-              <FiZap className="text-[10px]" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase text-white bg-gradient-to-r from-emerald-600 to-emerald-500 px-2.5 py-1 rounded-full shadow-xs tracking-wider border border-emerald-400/30">
+              <FiZap className="text-[11px]" />
               <span>Shorts</span>
             </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-black/50 text-slate-200 backdrop-blur-xs font-mono">
+            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-black/50 text-slate-200 border border-white/10 backdrop-blur-xs font-mono">
               {currentShort.duration || '0:50'}
             </span>
           </div>
 
-          {/* Center Play Graphic */}
+          {/* Center Play Graphic & Topic Info */}
           <div className="my-auto text-center space-y-4 z-10 px-2">
-            <div className="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center mx-auto shadow-2xl hover:scale-110 transition-transform cursor-pointer">
-              <FiPlay className="text-2xl ml-1" />
-            </div>
+            <button
+              type="button"
+              onClick={togglePlay}
+              className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-500 text-white flex items-center justify-center mx-auto shadow-2xl hover:scale-110 hover:shadow-emerald-500/40 transition-all border border-emerald-400/40 cursor-pointer"
+              title={isPlaying ? 'Pause' : 'Play'}
+            >
+              {isPlaying && currentShort.videoUrl ? (
+                <FiPause className="text-2xl" />
+              ) : (
+                <FiPlay className="text-2xl ml-1" />
+              )}
+            </button>
 
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-400 block">
                 {currentShort.category}
               </span>
-              <h2 className="text-base sm:text-lg font-bold font-display text-white leading-snug">
+              <h2 className="text-base sm:text-lg font-bold font-display text-white leading-snug drop-shadow-md">
                 {currentShort.title}
               </h2>
             </div>
           </div>
 
           {/* Bottom Card Information */}
-          <div className="space-y-2 z-10 pt-3 border-t border-white/10 text-left">
+          <div className="space-y-2 z-10 pt-3 border-t border-white/15 text-left bg-gradient-to-t from-black/80 via-black/40 to-transparent -mx-4 -mb-4 sm:-mx-5 sm:-mb-5 p-4 sm:p-5 rounded-b-3xl">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-500 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
                 WI
               </div>
-              <div>
-                <span className="text-xs font-bold text-white block leading-none">
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-white block leading-none truncate">
                   WHYINSURED Shorts
                 </span>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-slate-300">
                   {currentShort.views || '35K views'} • Verified Guidance
                 </span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-200 line-clamp-3 leading-relaxed">
+            <p className="text-xs text-slate-200 line-clamp-2 sm:line-clamp-3 leading-relaxed font-normal">
               {currentShort.description}
             </p>
           </div>
 
         </div>
 
-        {/* Right Floating Actions (Like, Save, Share, Up, Down) */}
-        <div className="flex flex-col items-center gap-3 shrink-0">
+        {/* ===================================================================
+            3. ACTION CONTROLS (LIKE, SAVE, SHARE, UP, DOWN)
+            - Responsive: Overlaid cleanly on mobile right edge, stacked sidebar on tablet/desktop
+        =================================================================== */}
+        <div className="absolute right-2 sm:right-auto sm:static bottom-24 sm:bottom-auto z-20 flex flex-col items-center gap-2.5 sm:gap-3 shrink-0">
           
           {/* Previous Short Button */}
           <button
             type="button"
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className="p-3 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-[#00A86B] hover:border-[#00A86B] disabled:opacity-30 disabled:cursor-not-allowed shadow-md transition-all cursor-pointer"
-            title="Previous Short (Up Arrow)"
+            className="p-2.5 sm:p-3 rounded-full bg-white/95 sm:bg-white border border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-500 hover:bg-emerald-50 disabled:opacity-30 disabled:cursor-not-allowed shadow-md transition-all cursor-pointer active:scale-95"
+            title="Previous Short (Up Arrow / Swipe Down)"
           >
-            <FiChevronUp className="text-xl" />
+            <FiChevronUp className="text-lg sm:text-xl" />
           </button>
 
           {/* Like Button */}
           <button
             type="button"
             onClick={handleLike}
-            className={`flex flex-col items-center gap-1 p-3 rounded-full transition-all cursor-pointer shadow-md ${
+            className={`flex flex-col items-center gap-1 p-2.5 sm:p-3 rounded-full transition-all cursor-pointer shadow-md active:scale-95 ${
               isLiked
-                ? 'bg-red-50 border border-red-200 text-red-600'
-                : 'bg-white border border-slate-200 text-slate-700 hover:text-red-600 hover:bg-slate-50'
+                ? 'border border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                : 'bg-white/95 sm:bg-white border border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-500/40 hover:bg-emerald-50'
             }`}
             title="Like this short"
           >
-            <FiHeart className={`text-xl ${isLiked ? 'fill-red-600' : ''}`} />
+            <FiHeart className={`text-lg sm:text-xl ${isLiked ? 'fill-emerald-600 text-emerald-700' : ''}`} />
             <span className="text-[10px] font-bold">
               {isLiked ? 'Liked' : 'Like'}
             </span>
@@ -239,14 +350,14 @@ export default function AcademyShortsPage() {
           <button
             type="button"
             onClick={handleSave}
-            className={`flex flex-col items-center gap-1 p-3 rounded-full transition-all cursor-pointer shadow-md ${
+            className={`flex flex-col items-center gap-1 p-2.5 sm:p-3 rounded-full transition-all cursor-pointer shadow-md active:scale-95 ${
               isSaved
-                ? 'bg-emerald-50 border border-emerald-200 text-[#00A86B]'
-                : 'bg-white border border-slate-200 text-slate-700 hover:text-[#00A86B] hover:bg-slate-50'
+                ? 'border border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                : 'bg-white/95 sm:bg-white border border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-500/40 hover:bg-emerald-50'
             }`}
             title="Save for Later"
           >
-            <FiBookmark className={`text-xl ${isSaved ? 'fill-[#00A86B]' : ''}`} />
+            <FiBookmark className={`text-lg sm:text-xl ${isSaved ? 'fill-emerald-600 text-emerald-700' : ''}`} />
             <span className="text-[10px] font-bold">
               {isSaved ? 'Saved' : 'Save'}
             </span>
@@ -256,13 +367,17 @@ export default function AcademyShortsPage() {
           <button
             type="button"
             onClick={handleShare}
-            className="flex flex-col items-center gap-1 p-3 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-[#00A86B] hover:bg-slate-50 shadow-md transition-all cursor-pointer"
+            className={`flex flex-col items-center gap-1 p-2.5 sm:p-3 rounded-full transition-all cursor-pointer shadow-md active:scale-95 ${
+              copied
+                ? 'border border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                : 'bg-white/95 sm:bg-white border border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-500/40 hover:bg-emerald-50'
+            }`}
             title="Share Short Link"
           >
             {copied ? (
-              <FiCheck className="text-xl text-emerald-600" />
+              <FiCheck className="text-lg sm:text-xl text-emerald-700" />
             ) : (
-              <FiShare2 className="text-xl" />
+              <FiShare2 className="text-lg sm:text-xl" />
             )}
             <span className="text-[10px] font-bold">
               {copied ? 'Copied' : 'Share'}
@@ -274,10 +389,10 @@ export default function AcademyShortsPage() {
             type="button"
             onClick={handleNext}
             disabled={currentIndex === allShorts.length - 1}
-            className="p-3 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-[#00A86B] hover:border-[#00A86B] disabled:opacity-30 disabled:cursor-not-allowed shadow-md transition-all cursor-pointer"
-            title="Next Short (Down Arrow)"
+            className="p-2.5 sm:p-3 rounded-full bg-white/95 sm:bg-white border border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-500 hover:bg-emerald-50 disabled:opacity-30 disabled:cursor-not-allowed shadow-md transition-all cursor-pointer active:scale-95"
+            title="Next Short (Down Arrow / Swipe Up)"
           >
-            <FiChevronDown className="text-xl" />
+            <FiChevronDown className="text-lg sm:text-xl" />
           </button>
 
         </div>

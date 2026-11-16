@@ -518,7 +518,66 @@ export const getDerivedValue = (plan, company, key) => {
   }
 };
 
-export const getPlanDetailData = (plan, company) => {
+export const STANDARD_COVERAGE_OPTIONS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100];
+
+export const parseCoverageRange = (coverageStr) => {
+  if (!coverageStr || typeof coverageStr !== 'string') {
+    return { min: 5, max: 100 };
+  }
+
+  const text = coverageStr.toLowerCase().replace(/,/g, '');
+
+  const extractLakhs = (valStr, unitStr) => {
+    const num = parseFloat(valStr);
+    if (isNaN(num)) return null;
+    if (unitStr && (unitStr.includes('crore') || unitStr.includes('cr'))) {
+      return num * 100;
+    }
+    return num;
+  };
+
+  const isUnlimited = text.includes('unlimited') || text.includes('infinity');
+  const matches = [...text.matchAll(/([\d.]+)\s*(lakhs?|crores?|cr|l\b)/g)];
+
+  if (matches.length >= 2) {
+    const min = extractLakhs(matches[0][1], matches[0][2]) ?? 5;
+    const max = isUnlimited ? Infinity : (extractLakhs(matches[1][1], matches[1][2]) ?? 100);
+    return { min, max };
+  } else if (matches.length === 1) {
+    const val = extractLakhs(matches[0][1], matches[0][2]) ?? 10;
+    if (isUnlimited) {
+      return { min: val, max: Infinity };
+    }
+    return { min: Math.min(val, 5), max: val };
+  }
+
+  return { min: 5, max: 100 };
+};
+
+export const getPlanSupportedCoverages = (plan) => {
+  if (!plan) return STANDARD_COVERAGE_OPTIONS;
+
+  if (Array.isArray(plan.coverageOptions) && plan.coverageOptions.length > 0) {
+    return plan.coverageOptions;
+  }
+  if (Array.isArray(plan.planData?.coverageOptions) && plan.planData.coverageOptions.length > 0) {
+    return plan.planData.coverageOptions;
+  }
+
+  const rawCoverage = plan.coverage || plan.planData?.coverage || '';
+  const { min, max } = parseCoverageRange(rawCoverage);
+
+  const filtered = STANDARD_COVERAGE_OPTIONS.filter((amt) => amt >= min && amt <= max);
+
+  if (filtered.length === 0) {
+    if (min && min !== Infinity) return [min];
+    return STANDARD_COVERAGE_OPTIONS;
+  }
+
+  return filtered;
+};
+
+export const getPlanDetailData = (plan, company, selectedCoverage) => {
   if (!plan || !company) return [];
   const planData = getActualPlanData(plan, company);
 
@@ -598,7 +657,13 @@ export const getPlanDetailData = (plan, company) => {
       title: "Compare With",
       isGrouped: false,
       features: [
-        { key: "compareCoverage", title: "Sum Insured Option", value: planData?.coverage || plan.coverage || "₹5 Lakh - ₹1 Crore" },
+        {
+          key: "compareCoverage",
+          title: "Sum Insured Option",
+          value: selectedCoverage
+            ? (Number(selectedCoverage) >= 100 ? `₹${Number(selectedCoverage) / 100} Crore` : `₹${selectedCoverage} Lakh`)
+            : (planData?.coverage || plan.coverage || "₹5 Lakh - ₹1 Crore")
+        },
         { key: "compareEligibility", title: "Eligibility Criteria", value: plan.details?.eligibility || planData?.eligibility || "Adults 18+ & Children 91 days to 25 years" },
         { key: "compareExclusions", title: "Key Exclusions", value: plan.details?.exclusions || "Cosmetic surgery, intentional self-injury, breach of law" },
       ]
@@ -606,9 +671,9 @@ export const getPlanDetailData = (plan, company) => {
   ];
 };
 
-export const getComparisonSections = (plan1, company1, plan2, company2) => {
-  const p1Data = getPlanDetailData(plan1, company1);
-  const p2Data = getPlanDetailData(plan2, company2);
+export const getComparisonSections = (plan1, company1, plan2, company2, cov1, cov2) => {
+  const p1Data = getPlanDetailData(plan1, company1, cov1);
+  const p2Data = getPlanDetailData(plan2, company2, cov2);
 
   return p1Data.map((section, secIdx) => {
     const sec2 = p2Data.find(s => s.title === section.title) || p2Data[secIdx] || { features: [], groups: [] };

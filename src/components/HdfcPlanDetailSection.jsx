@@ -1428,7 +1428,7 @@ export default function HdfcPlanDetailSection({ plan, company, planId: planIdPro
           <button
             type="button"
             onClick={() => setActiveModal('mustKnow')}
-            className={`bg-white rounded-xl sm:rounded-2xl border p-2.5 sm:p-4 md:p-5 flex items-center justify-between text-left shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.98] select-none ${
+            className={`col-span-1 sm:col-span-2 sm:[grid-column:1/-1] bg-white rounded-xl sm:rounded-2xl border p-2.5 sm:p-4 md:p-5 flex items-center justify-between text-left shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.98] select-none ${
               activeModal === 'mustKnow'
                 ? 'border-[#E30613] ring-2 ring-[#E30613]/20'
                 : 'border-slate-200/80 hover:border-[#E30613]/40'

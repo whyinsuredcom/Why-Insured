@@ -46,7 +46,7 @@ export default function AcademyVideosPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+            <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
               <FiVideo />
             </span>
             <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -64,7 +64,7 @@ export default function AcademyVideosPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#00A86B] cursor-pointer shadow-2xs"
+            className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
           >
             <option value="popular">Most Popular</option>
             <option value="latest">Latest Uploads</option>
@@ -81,7 +81,7 @@ export default function AcademyVideosPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by title, topic, or policy keyword..."
-            className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00A86B] focus:ring-1 focus:ring-[#00A86B] transition-all shadow-2xs"
+            className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all shadow-2xs"
           />
           {searchQuery && (
             <button
@@ -103,10 +103,10 @@ export default function AcademyVideosPage() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all duration-200 cursor-pointer select-none border ${
                   isActive
-                    ? 'bg-[#102A43] text-white shadow-2xs'
-                    : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                    ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                    : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:shadow-xs'
                 }`}
               >
                 {cat}
@@ -139,7 +139,7 @@ export default function AcademyVideosPage() {
               setSearchQuery('');
               setSelectedCategory('All');
             }}
-            className="px-4 py-2 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors cursor-pointer"
           >
             Show All Videos
           </button>

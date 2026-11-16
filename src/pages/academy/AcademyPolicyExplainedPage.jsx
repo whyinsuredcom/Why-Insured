@@ -21,7 +21,7 @@ export default function AcademyPolicyExplainedPage() {
       {/* Header */}
       <div className="border-b border-slate-200/80 pb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-lg bg-[#00A86B] text-white flex items-center justify-center text-xs shadow-xs">
+          <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
             <FiFileText />
           </span>
           <h1 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -52,7 +52,7 @@ export default function AcademyPolicyExplainedPage() {
                   onClick={() => setActiveTopicId(topic.id)}
                   className={`w-full p-4 rounded-2xl text-left transition-all border cursor-pointer ${
                     isActive
-                      ? 'bg-white border-[#00A86B] shadow-md ring-1 ring-[#00A86B]/20'
+                      ? 'bg-emerald-50/70 border-emerald-500 shadow-sm ring-1 ring-emerald-500/30'
                       : 'bg-white/60 hover:bg-white border-slate-200/90 text-slate-700'
                   }`}
                 >
@@ -60,7 +60,7 @@ export default function AcademyPolicyExplainedPage() {
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         isActive
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          ? 'bg-emerald-100/90 text-emerald-800 border border-emerald-500/30'
                           : 'bg-slate-100 text-slate-500'
                       }`}
                     >
@@ -68,7 +68,7 @@ export default function AcademyPolicyExplainedPage() {
                     </span>
                     <FiArrowRight
                       className={`text-xs transition-transform ${
-                        isActive ? 'text-[#00A86B] translate-x-1' : 'text-slate-300'
+                        isActive ? 'text-emerald-600 translate-x-1' : 'text-slate-300'
                       }`}
                     />
                   </div>
@@ -93,7 +93,7 @@ export default function AcademyPolicyExplainedPage() {
           <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-6">
             
             <div className="space-y-2 border-b border-slate-100 pb-4">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100/90 text-emerald-800 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                 {activeTopic.badge}
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-[#102A43] font-display">
@@ -145,7 +145,7 @@ export default function AcademyPolicyExplainedPage() {
                       ? `/insurance-academy/shorts?id=${linkedVideo.id}`
                       : `/insurance-academy/watch/${linkedVideo.id}`
                   }
-                  className="px-4 py-2 rounded-xl bg-[#00A86B] hover:bg-[#0FA26E] text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
                 >
                   <FiPlay className="text-xs" />
                   <span>Watch Video</span>

@@ -69,7 +69,7 @@ export default function AcademyPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search videos by title or topic..."
-              className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00A86B] focus:ring-1 focus:ring-[#00A86B] transition-all shadow-2xs"
+              className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
@@ -92,10 +92,10 @@ export default function AcademyPage() {
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all cursor-pointer select-none ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer select-none border ${
                     isActive
-                      ? 'bg-[#102A43] text-white shadow-2xs'
-                      : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90'
+                      ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
+                      : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xs'
                   }`}
                 >
                   {cat}
@@ -133,7 +133,7 @@ export default function AcademyPage() {
                   setSearchQuery('');
                   setSelectedCategory('All Videos');
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-[#102A43] hover:bg-[#00A86B] text-white text-xs font-semibold transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
               >
                 Show All Videos
               </button>

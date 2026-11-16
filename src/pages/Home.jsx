@@ -326,7 +326,7 @@ export default function Home() {
           )}
         </motion.div>
 
-        {/* Mobile Hero Navigation Buttons (Insurance, Compare, Advisors, Claim) - Visible ONLY on mobile */}
+        {/* Mobile Hero Navigation Buttons (Insurance, Compare, Advisors) - Visible ONLY on mobile */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -357,22 +357,14 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* ROW 2: [ Advisors ] [ Claim ] */}
-          <div className="grid grid-cols-2 gap-2.5 w-full">
+          {/* ROW 2: [ Advisors ] */}
+          <div className="w-full">
             <Link
               to="/advisors"
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-full shadow-sm hover:shadow-md hover:border-slate-300 text-slate-700 hover:text-emerald-600 text-xs font-bold transition-all duration-200 cursor-pointer w-full"
             >
               <FiUsers className="text-[#059669] text-sm shrink-0" />
               <span>Advisors</span>
-            </Link>
-
-            <Link
-              to="/claim"
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-full shadow-sm hover:shadow-md hover:border-slate-300 text-slate-700 hover:text-emerald-600 text-xs font-bold transition-all duration-200 cursor-pointer w-full"
-            >
-              <FiShield className="text-[#059669] text-sm shrink-0" />
-              <span>Claim</span>
             </Link>
           </div>
 

@@ -76,15 +76,15 @@ export default function AcademySidebar({
                   className={({ isActive }) =>
                     `flex items-center gap-3.5 px-3.5 py-2.5 mx-2 rounded-xl text-xs font-semibold transition-all group ${
                       isActive
-                        ? 'bg-[#00A86B]/10 text-[#00A86B] font-bold shadow-2xs'
-                        : 'text-slate-600 hover:text-[#102A43] hover:bg-slate-100'
+                        ? 'bg-emerald-100/90 text-emerald-800 border border-emerald-500/35 font-bold shadow-2xs'
+                        : 'text-slate-600 hover:text-emerald-800 hover:bg-emerald-50/70'
                     } ${isCollapsed ? 'justify-center mx-1 px-2' : ''}`
                   }
                   title={item.label}
                 >
                   <Icon
                     className={`text-base shrink-0 transition-transform group-hover:scale-110 ${
-                      item.badge === 'Shorts' ? 'text-red-500' : ''
+                      item.badge === 'Shorts' ? 'text-emerald-600' : ''
                     }`}
                   />
                   {!isCollapsed && (
@@ -92,11 +92,7 @@ export default function AcademySidebar({
                   )}
                   {!isCollapsed && item.badge && (
                     <span
-                      className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded ${
-                        item.badge === 'Shorts'
-                          ? 'bg-red-500/10 text-red-600'
-                          : 'bg-emerald-500/10 text-[#00A86B]'
-                      }`}
+                      className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-100/80 text-emerald-800 border border-emerald-500/25"
                     >
                       {item.badge}
                     </span>
@@ -164,7 +160,7 @@ export default function AcademySidebar({
         {/* Drawer Header */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#00A86B] text-white flex items-center justify-center font-bold text-xs">
+            <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
               WI
             </div>
             <span className="text-sm font-extrabold text-[#102A43] font-display">
