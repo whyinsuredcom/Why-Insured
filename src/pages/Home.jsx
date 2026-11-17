@@ -14,6 +14,7 @@ import { searchGlobalInsurance } from '../utils/globalSearchHelper';
 import { detectQueryIntent } from '../utils/searchIntentDetector';
 import RealInsuranceSearchResultPanel from '../components/RealInsuranceSearchResultPanel';
 import AiChatAssistant from '../components/AiChatAssistant';
+import { FEATURE_FLAGS } from '../config/features';
 
 export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -358,15 +359,17 @@ export default function Home() {
           </div>
 
           {/* ROW 2: [ Advisors ] */}
-          <div className="w-full">
-            <Link
-              to="/advisors"
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-full shadow-sm hover:shadow-md hover:border-slate-300 text-slate-700 hover:text-emerald-600 text-xs font-bold transition-all duration-200 cursor-pointer w-full"
-            >
-              <FiUsers className="text-[#059669] text-sm shrink-0" />
-              <span>Advisors</span>
-            </Link>
-          </div>
+          {FEATURE_FLAGS.ADVISOR_NAVIGATION && (
+            <div className="w-full">
+              <Link
+                to="/advisors"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-full shadow-sm hover:shadow-md hover:border-slate-300 text-slate-700 hover:text-emerald-600 text-xs font-bold transition-all duration-200 cursor-pointer w-full"
+              >
+                <FiUsers className="text-[#059669] text-sm shrink-0" />
+                <span>Advisors</span>
+              </Link>
+            </div>
+          )}
 
           {/* Supported Providers Grid for Mobile Insurance Button */}
           <AnimatePresence>

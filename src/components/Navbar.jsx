@@ -10,6 +10,7 @@ import { safeSessionStorage } from '../utils/safeStorage';
 import { companiesData } from '../data/companies';
 import { fetchPublicCompanies } from '../services/publicApiService';
 import CompareForm from './CompareForm';
+import { FEATURE_FLAGS } from '../config/features';
 
 export default function Navbar() {
   const [companiesList, setCompaniesList] = useState(companiesData);
@@ -473,20 +474,22 @@ export default function Navbar() {
             </div>
 
             {/* Advisors Link */}
-            <Link
-              to="/advisors"
-              className={`relative py-1 text-sm font-semibold transition-colors duration-250 cursor-pointer ${
-                isActive('/advisors') ? 'text-[#0F172A]' : 'text-slate-500 hover:text-[#0F172A]'
-              }`}
-            >
-              <span>Advisors</span>
-              {isActive('/advisors') && (
-                <motion.span 
-                  layoutId="nav-active-dot"
-                  className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-600"
-                />
-              )}
-            </Link>
+            {FEATURE_FLAGS.ADVISOR_NAVIGATION && (
+              <Link
+                to="/advisors"
+                className={`relative py-1 text-sm font-semibold transition-colors duration-250 cursor-pointer ${
+                  isActive('/advisors') ? 'text-[#0F172A]' : 'text-slate-500 hover:text-[#0F172A]'
+                }`}
+              >
+                <span>Advisors</span>
+                {isActive('/advisors') && (
+                  <motion.span 
+                    layoutId="nav-active-dot"
+                    className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-600"
+                  />
+                )}
+              </Link>
+            )}
 
           </div>
 

@@ -67,30 +67,38 @@ export default function AcademySearchBar({ className = '' }) {
 
   return (
     <div ref={searchContainerRef} className={`relative w-full ${className}`}>
-      <form onSubmit={handleSubmit} className="relative flex items-center w-full">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none flex items-center">
-          <FiSearch className={isFocused ? 'text-emerald-600' : 'text-slate-400'} />
-        </div>
-        <input
-          type="text"
-          value={searchQuery}
-          onFocus={() => {
-            setIsFocused(true);
-            if (searchQuery.trim().length >= 2) setDropdownOpen(true);
-          }}
-          onBlur={() => setIsFocused(false)}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setDropdownOpen(true);
-          }}
-          placeholder="Search Academy videos, articles, topics and guides..."
-          className={`w-full h-11 sm:h-12 pl-11 pr-24 sm:pr-28 rounded-2xl bg-white border text-xs sm:text-sm text-slate-800 placeholder-slate-400 shadow-2xs transition-all duration-200 focus:outline-none ${
-            isFocused
-              ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm'
-              : 'border-slate-200/90 hover:border-slate-300'
-          }`}
-        />
-        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+      <form onSubmit={handleSubmit} className="relative flex items-center w-full max-w-2xl mx-auto">
+        <div className="relative flex-1 flex items-center h-10 sm:h-11 md:h-12">
+          {/* Subtle inside search icon when focused (like YouTube desktop) */}
+          {isFocused && (
+            <div className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none flex items-center">
+              <FiSearch />
+            </div>
+          )}
+
+          <input
+            type="text"
+            value={searchQuery}
+            onFocus={() => {
+              setIsFocused(true);
+              if (searchQuery.trim().length >= 2) setDropdownOpen(true);
+            }}
+            onBlur={() => setIsFocused(false)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setDropdownOpen(true);
+            }}
+            placeholder="Search Academy videos, topics, guides..."
+            className={`w-full h-full ${
+              isFocused ? 'pl-9 sm:pl-10' : 'pl-4 sm:pl-5'
+            } pr-9 sm:pr-10 rounded-l-full bg-white border text-xs sm:text-sm text-slate-800 placeholder-slate-400 transition-all duration-200 focus:outline-none ${
+              isFocused
+                ? 'border-emerald-500 ring-2 ring-emerald-500/20 z-10'
+                : 'border-slate-300/90 hover:border-slate-400'
+            }`}
+          />
+
+          {/* Clear 'X' button inside input */}
           {searchQuery && (
             <button
               type="button"
@@ -98,19 +106,28 @@ export default function AcademySearchBar({ className = '' }) {
                 setSearchQuery('');
                 setDropdownOpen(false);
               }}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer z-10"
               title="Clear search"
+              aria-label="Clear search"
             >
               <FiX className="text-sm" />
             </button>
           )}
-          <button
-            type="submit"
-            className="px-3 sm:px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer flex items-center gap-1"
-          >
-            <span>Search</span>
-          </button>
         </div>
+
+        {/* Dedicated YouTube-style Attached Search Button */}
+        <button
+          type="submit"
+          className={`h-10 sm:h-11 md:h-12 px-4 sm:px-6 rounded-r-full bg-slate-100 hover:bg-slate-200/90 active:bg-slate-300 border-y border-r text-slate-600 hover:text-slate-900 transition-colors flex items-center justify-center shrink-0 cursor-pointer shadow-2xs ${
+            isFocused
+              ? 'border-emerald-500 border-l border-l-slate-300'
+              : 'border-slate-300/90'
+          }`}
+          title="Search"
+          aria-label="Search"
+        >
+          <FiSearch className="text-sm sm:text-base" />
+        </button>
       </form>
 
       {/* Autocomplete / Instant Suggestions Dropdown */}

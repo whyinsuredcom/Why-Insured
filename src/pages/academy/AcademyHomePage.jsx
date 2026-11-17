@@ -128,38 +128,27 @@ export default function AcademyHomePage() {
       )}
 
       {/* =====================================================================
-          1. CATEGORY NAVIGATION CHIPS (EXPLORE TOPICS)
+          1. CATEGORY NAVIGATION CHIPS (YOUTUBE STICKY TOP FILTER BAR)
       ===================================================================== */}
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base sm:text-lg font-bold text-[#102A43] font-display">
-            Explore Topics
-          </h2>
-          <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-            Filter lessons by insurance domain
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 no-scrollbar">
-          {(Array.isArray(categories) && categories.length > 0 ? categories : ACADEMY_CATEGORIES).map((cat) => {
-            const isActive = selectedCategory === cat;
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all duration-200 cursor-pointer select-none border ${
-                  isActive
-                    ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
-                    : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:shadow-xs'
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      <div className="sticky top-14 sm:top-16 z-20 bg-[#F8FAFC]/95 backdrop-blur-md py-2.5 -mx-3 px-3 sm:-mx-5 sm:px-5 lg:-mx-6 lg:px-6 border-b border-slate-200/70 flex items-center gap-2 overflow-x-auto no-scrollbar shadow-3xs">
+        {(Array.isArray(categories) && categories.length > 0 ? categories : ACADEMY_CATEGORIES).map((cat) => {
+          const isActive = selectedCategory === cat;
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all duration-150 cursor-pointer select-none border ${
+                isActive
+                  ? 'border-[#102A43] bg-[#102A43] text-white shadow-xs'
+                  : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700'
+              }`}
+            >
+              {cat}
+            </button>
+          );
+        })}
+      </div>
 
       {/* =====================================================================
           F. CONTINUE LEARNING (SHOWS IF USER HAS WATCH HISTORY)
@@ -261,7 +250,7 @@ export default function AcademyHomePage() {
         </div>
 
         {filteredVideos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-x-4 gap-y-7 sm:gap-x-5 sm:gap-y-8">
             {filteredVideos.map((video) => (
               <AcademyVideoCard key={video.id} video={video} />
             ))}
@@ -298,7 +287,7 @@ export default function AcademyHomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-x-4 gap-y-7 sm:gap-x-5 sm:gap-y-8">
           {trendingVideos.map((video) => (
             <AcademyVideoCard key={video.id} video={video} />
           ))}

@@ -103,10 +103,10 @@ export default function AcademyVideosPage() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all duration-200 cursor-pointer select-none border ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all duration-150 cursor-pointer select-none border ${
                   isActive
-                    ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 shadow-sm'
-                    : 'border-emerald-500/25 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500/40 hover:shadow-xs'
+                    ? 'border-[#102A43] bg-[#102A43] text-white shadow-xs'
+                    : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700'
                 }`}
               >
                 {cat}
@@ -118,7 +118,7 @@ export default function AcademyVideosPage() {
 
       {/* Videos Grid */}
       {filteredVideos.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-x-4 gap-y-7 sm:gap-x-5 sm:gap-y-8">
           {filteredVideos.map((video) => (
             <AcademyVideoCard key={video.id} video={video} />
           ))}

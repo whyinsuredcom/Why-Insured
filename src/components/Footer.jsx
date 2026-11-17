@@ -11,6 +11,7 @@ import {
 } from 'react-icons/fi';
 import logoImg from '../assets/logo.png';
 import { safeSessionStorage } from '../utils/safeStorage';
+import { FEATURE_FLAGS } from '../config/features';
 
 export const WHYINSURED_CONTACT_EMAIL = "whyinsured3@gmail.com";
 export const FOOTER_CONTACT_EMAIL = WHYINSURED_CONTACT_EMAIL;
@@ -21,7 +22,7 @@ export default function Footer() {
   const quickLinks = [
     { name: 'Health Insurance', path: '/' },
     { name: 'Compare Plans', path: '/compare' },
-    { name: 'Advisors', path: '/advisors' },
+    ...(FEATURE_FLAGS.ADVISOR_NAVIGATION ? [{ name: 'Advisors', path: '/advisors' }] : []),
     { name: 'Insurance Academy', path: '/academy' }
   ];
 

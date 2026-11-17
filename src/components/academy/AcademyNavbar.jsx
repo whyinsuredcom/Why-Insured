@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   FiMenu,
@@ -10,6 +10,7 @@ import {
   FiFileText,
   FiBookOpen,
   FiArrowRight,
+  FiArrowLeft,
   FiShield
 } from 'react-icons/fi';
 import { ACADEMY_VIDEOS, ACADEMY_ARTICLES, ACADEMY_DICTIONARY } from '../../data/academyData';
@@ -18,12 +19,14 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const searchContainerRef = useRef(null);
+  const mobileInputRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Search results across videos, articles, and dictionary
-  const searchResults = React.useMemo(() => {
+  const searchResults = useMemo(() => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) return null;
     const q = searchQuery.toLowerCase().trim();
 
@@ -60,25 +63,133 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Auto focus mobile search input when mobile search is opened
+  useEffect(() => {
+    if (mobileSearchOpen && mobileInputRef.current) {
+      mobileInputRef.current.focus();
+    }
+  }, [mobileSearchOpen]);
+
   const handleSearchSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!searchQuery.trim()) return;
     setSearchDropdownOpen(false);
+    setMobileSearchOpen(false);
     navigate(`/insurance-academy/videos?search=${encodeURIComponent(searchQuery.trim())}`);
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 h-16 transition-all select-none">
-      <div className="h-full px-3 sm:px-5 flex items-center justify-between gap-3 max-w-[1920px] mx-auto">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 h-14 sm:h-16 transition-all select-none">
+      <div className="h-full px-3 sm:px-5 flex items-center justify-between gap-3 max-w-[1920px] mx-auto relative">
         
+        {/* ===================================================================
+            MOBILE FULL-WIDTH SEARCH OVERLAY (YOUTUBE MOBILE PATTERN)
+        =================================================================== */}
+        {mobileSearchOpen ? (
+          <div className="sm:hidden absolute inset-0 z-50 bg-white px-3 flex items-center gap-2 w-full h-full">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileSearchOpen(false);
+                setSearchDropdownOpen(false);
+              }}
+              className="p-2 -ml-1 text-slate-600 hover:text-slate-900 rounded-full hover:bg-slate-100 transition-colors"
+              aria-label="Back"
+            >
+              <FiArrowLeft className="text-xl" />
+            </button>
+
+            <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center h-10 relative">
+              <input
+                ref={mobileInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSearchDropdownOpen(true);
+                }}
+                placeholder="Search Academy..."
+                className="w-full h-full pl-4 pr-10 rounded-l-full bg-slate-100 border border-r-0 border-slate-300 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSearchDropdownOpen(false);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                  aria-label="Clear text"
+                >
+                  <FiX className="text-base" />
+                </button>
+              )}
+              <button
+                type="submit"
+                className="h-full px-4 rounded-r-full bg-slate-200 border border-slate-300 text-slate-700 flex items-center justify-center shrink-0"
+                aria-label="Search"
+              >
+                <FiSearch className="text-base" />
+              </button>
+            </form>
+
+            {/* Mobile Dropdown Results */}
+            {searchDropdownOpen && searchResults && (
+              <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-2xl max-h-[75vh] overflow-y-auto text-left z-50">
+                {searchResults.total === 0 ? (
+                  <div className="p-4 text-xs text-slate-500 text-center">
+                    No matching lessons found for "{searchQuery}".
+                  </div>
+                ) : (
+                  <div className="py-2 divide-y divide-slate-100">
+                    {searchResults.videos.map((vid) => (
+                      <Link
+                        key={vid.id}
+                        to={`/insurance-academy/watch/${vid.id}`}
+                        onClick={() => {
+                          setSearchDropdownOpen(false);
+                          setMobileSearchOpen(false);
+                        }}
+                        className="px-4 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition-colors"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs">
+                          <FiPlay />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-xs font-semibold text-[#102A43] truncate">
+                            {vid.title}
+                          </h4>
+                          <span className="text-[10px] text-slate-400">
+                            {vid.category} • {vid.duration || 'Video'}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                    <div className="p-2 bg-slate-50 text-center">
+                      <button
+                        type="button"
+                        onClick={handleSearchSubmit}
+                        className="text-xs font-bold text-emerald-700 inline-flex items-center gap-1 py-1"
+                      >
+                        <span>View all results for "{searchQuery}"</span>
+                        <FiArrowRight className="text-xs" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : null}
+
         {/* ===================================================================
             LEFT: SIDEBAR TOGGLE & WHYINSURED ACADEMY BRANDING
         =================================================================== */}
-        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-2 rounded-full text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             aria-label="Toggle Navigation Sidebar"
           >
             <FiMenu className="text-xl" />
@@ -103,11 +214,16 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
         </div>
 
         {/* ===================================================================
-            CENTER: YOUTUBE-STYLE EXPANDED SEARCH BAR & INSTANT DROPDOWN
+            CENTER: YOUTUBE-STYLE EXPANDED SEARCH BAR (DESKTOP & TABLET)
         =================================================================== */}
-        <div ref={searchContainerRef} className="flex-1 max-w-2xl relative mx-2 sm:mx-4">
+        <div ref={searchContainerRef} className="hidden sm:block flex-1 max-w-2xl relative mx-3 md:mx-6">
           <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
-            <div className="relative flex-1">
+            <div className="relative flex-1 flex items-center h-10 sm:h-11 md:h-12">
+              {isSearchFocused && (
+                <div className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none flex items-center">
+                  <FiSearch />
+                </div>
+              )}
               <input
                 type="text"
                 value={searchQuery}
@@ -115,15 +231,18 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
                   setIsSearchFocused(true);
                   if (searchQuery.trim().length >= 2) setSearchDropdownOpen(true);
                 }}
+                onBlur={() => setIsSearchFocused(false)}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setSearchDropdownOpen(true);
                 }}
-                placeholder="Search insurance videos, topics, guides, terms..."
-                className={`w-full py-2 pl-4 pr-10 rounded-l-full bg-slate-50 border text-xs sm:text-sm text-[#17212B] placeholder-slate-400 focus:outline-none transition-all ${
+                placeholder="Search Academy videos, topics, guides..."
+                className={`w-full h-full ${
+                  isSearchFocused ? 'pl-9 sm:pl-10' : 'pl-4 sm:pl-5'
+                } pr-9 sm:pr-10 rounded-l-full bg-white border text-xs sm:text-sm text-slate-800 placeholder-slate-400 transition-all duration-200 focus:outline-none ${
                   isSearchFocused
-                    ? 'border-emerald-500 bg-white ring-2 ring-emerald-500/20'
-                    : 'border-slate-300/80 hover:border-slate-400'
+                    ? 'border-emerald-500 ring-2 ring-emerald-500/20 z-10'
+                    : 'border-slate-300 hover:border-slate-400'
                 }`}
               />
               {searchQuery && (
@@ -133,28 +252,36 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
                     setSearchQuery('');
                     setSearchDropdownOpen(false);
                   }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer z-10"
+                  title="Clear search"
+                  aria-label="Clear search"
                 >
-                  <FiX className="text-xs sm:text-sm" />
+                  <FiX className="text-sm" />
                 </button>
               )}
             </div>
 
+            {/* Attached Search Button (YouTube Desktop Style) */}
             <button
               type="submit"
-              className="px-4 sm:px-6 py-2 rounded-r-full bg-slate-100 hover:bg-slate-200 border-y border-r border-slate-300/80 text-slate-600 hover:text-slate-900 transition-colors flex items-center justify-center shrink-0 cursor-pointer"
-              title="Search Academy"
+              className={`h-10 sm:h-11 md:h-12 px-5 sm:px-6 rounded-r-full bg-slate-100 hover:bg-slate-200/90 active:bg-slate-300 border-y border-r text-slate-600 hover:text-slate-900 transition-colors flex items-center justify-center shrink-0 cursor-pointer shadow-2xs ${
+                isSearchFocused
+                  ? 'border-emerald-500 border-l border-l-slate-300'
+                  : 'border-slate-300'
+              }`}
+              title="Search"
+              aria-label="Search"
             >
-              <FiSearch className="text-sm sm:text-base" />
+              <FiSearch className="text-base sm:text-lg" />
             </button>
           </form>
 
           {/* Instant Dropdown Search Results */}
           {searchDropdownOpen && searchResults && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden z-50 text-left max-h-[460px] overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-200/90 shadow-2xl overflow-hidden z-50 text-left max-h-[460px] overflow-y-auto">
               {searchResults.total === 0 ? (
                 <div className="p-4 text-center text-xs text-slate-500">
-                  No matching videos or guides found for "{searchQuery}".
+                  No matching lessons or guides found for "{searchQuery}".
                 </div>
               ) : (
                 <div className="py-2 divide-y divide-slate-100">
@@ -162,8 +289,8 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
                   {/* Videos */}
                   {searchResults.videos.length > 0 && (
                     <div className="py-2">
-                      <div className="px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Videos ({searchResults.videos.length})
+                      <div className="px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                        <span>Videos ({searchResults.videos.length})</span>
                       </div>
                       {searchResults.videos.map((vid) => (
                         <Link
@@ -180,7 +307,7 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
                               {vid.title}
                             </h4>
                             <span className="text-[10px] text-slate-400">
-                              {vid.category} • {vid.duration || 'Short'}
+                              {vid.category} • {vid.duration || 'Video'}
                             </span>
                           </div>
                         </Link>
@@ -192,7 +319,7 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
                   {searchResults.articles.length > 0 && (
                     <div className="py-2">
                       <div className="px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Guides & Articles ({searchResults.articles.length})
+                        Articles & Guides ({searchResults.articles.length})
                       </div>
                       {searchResults.articles.map((art) => (
                         <Link
@@ -247,11 +374,11 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
                   )}
 
                   {/* View all results button */}
-                  <div className="p-2 bg-slate-50 text-center">
+                  <div className="p-2.5 bg-slate-50 text-center">
                     <button
                       type="button"
                       onClick={handleSearchSubmit}
-                      className="text-xs font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1 cursor-pointer py-1"
                     >
                       <span>View all results for "{searchQuery}"</span>
                       <FiArrowRight className="text-xs" />
@@ -265,28 +392,42 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
         </div>
 
         {/* ===================================================================
-            RIGHT: SAVED SHORTCUTS & MAIN WEBSITE RETURN
+            RIGHT: SEARCH TRIGGER (MOBILE), WATCH LATER, SAVED & MAIN SITE
         =================================================================== */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Mobile Search Button (reveals full-width mobile search) */}
+          <button
+            type="button"
+            onClick={() => setMobileSearchOpen(true)}
+            className="sm:hidden p-2 rounded-full text-slate-700 hover:bg-slate-100 transition-colors"
+            title="Search"
+            aria-label="Open search"
+          >
+            <FiSearch className="text-lg" />
+          </button>
+
           <Link
             to="/insurance-academy/watch-later"
-            className="p-2 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors cursor-pointer relative"
+            className="p-2 rounded-full text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors cursor-pointer relative"
             title="Watch Later"
+            aria-label="Watch Later"
           >
             <FiClock className="text-lg" />
           </Link>
 
           <Link
             to="/insurance-academy/saved"
-            className="p-2 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors cursor-pointer relative"
+            className="p-2 rounded-full text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors cursor-pointer relative"
             title="Saved Videos & Articles"
+            aria-label="Saved Library"
           >
             <FiBookmark className="text-lg" />
           </Link>
 
           <Link
             to="/"
-            className="hidden md:inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-[#102A43] px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 transition-all cursor-pointer ml-1"
+            className="hidden lg:inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-[#102A43] px-3.5 py-1.5 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 transition-all cursor-pointer ml-1 shadow-2xs"
+            title="Return to WHYINSURED Main Website"
           >
             <span>Main Site</span>
             <FiArrowRight className="text-xs" />
@@ -297,4 +438,3 @@ export default function AcademyNavbar({ onToggleSidebar, isSidebarCollapsed }) {
     </header>
   );
 }
-

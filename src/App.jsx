@@ -11,6 +11,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Preloader from './components/Preloader';
 import FloatingActions from './components/FloatingActions';
+import { FEATURE_FLAGS } from './config/features';
 
 // Pages
 import Home from './pages/Home';
@@ -152,8 +153,8 @@ function App() {
           transition={{ duration: 0.4 }}
           className="min-h-screen bg-[#F8FAFC] flex flex-col justify-start text-slate-800 antialiased font-sans"
         >
-          {/* Public Header - Rendered across all public pages */}
-          <Navbar />
+          {/* Public Header - Rendered across all public pages except dedicated Academy */}
+          {!isAcademyRoute && <Navbar />}
 
           {/* Main Routing Panel wrapped in RouteErrorBoundary */}
           <main className="flex-grow">
@@ -212,7 +213,9 @@ function App() {
           <Footer />
 
           {/* Unified Floating Actions Container (Chat with WHYINSURED + Upload Your Policy) */}
-          <FloatingActions />
+          {(FEATURE_FLAGS.AI_CHAT_WIDGET || FEATURE_FLAGS.POLICY_UPLOAD_WIDGET) && (
+            <FloatingActions />
+          )}
         </motion.div>
       )}
     </AnimatePresence>

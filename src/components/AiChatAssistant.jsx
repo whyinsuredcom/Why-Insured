@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi';
 import aiAvatarImg from '../assets/ai_advisor_avatar.jpg';
 import { sendUserRequirementToAi, clientFallbackMatcher } from '../services/aiChatService';
+import { FEATURE_FLAGS } from '../config/features';
 
 // Global event dispatchers to control AI Chat from anywhere
 export const openAiChat = () => {
@@ -503,6 +504,11 @@ export default function AiChatAssistant({
   // If rendered inline (inside the homepage search bar container)
   if (inline) {
     return modalContent;
+  }
+
+  // If floating AI Chat widget is disabled via central FEATURE_FLAGS, do not render floating button or portal
+  if (!FEATURE_FLAGS.AI_CHAT_WIDGET) {
+    return null;
   }
 
   const isHomePage = location.pathname === '/';

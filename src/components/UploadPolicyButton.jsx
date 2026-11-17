@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FEATURE_FLAGS } from '../config/features';
 
 /**
  * UploadPolicyButton Component
@@ -17,6 +18,11 @@ import { motion } from 'framer-motion';
  */
 export default function UploadPolicyButton() {
   const location = useLocation();
+
+  // Controlled via central FEATURE_FLAGS
+  if (!FEATURE_FLAGS.POLICY_UPLOAD_WIDGET) {
+    return null;
+  }
 
   // If user is already on the dedicated Upload Policy page, hide the floating button
   if (location.pathname === '/upload-policy') {

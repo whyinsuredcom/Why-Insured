@@ -140,32 +140,35 @@ export default function AcademyWatchPage() {
             </h1>
           </div>
 
-          {/* 3. Channel Info & Action Buttons Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 border-y border-slate-200/80">
+          {/* 3. Channel Info & Action Buttons Row (YouTube Style) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
             {/* Channel Identity */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#102A43] to-[#1A3A5E] text-white flex items-center justify-center font-bold text-sm shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#102A43] to-[#1A3A5E] text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
                 WI
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-bold text-[#102A43]">
-                  {video.instructor || 'WHYINSURED Advisory Specialists'}
+                <h3 className="text-sm font-bold text-[#102A43] flex items-center gap-1.5">
+                  <span>{video.instructor || 'WHYINSURED Advisory Specialists'}</span>
+                  <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded-full font-semibold border border-emerald-200/60">
+                    Verified
+                  </span>
                 </h3>
-                <span className="text-[11px] text-slate-400">
-                  {video.views || '15K views'} • {video.uploadDate || 'Recently published'}
+                <span className="text-xs text-slate-500">
+                  {video.category} • Insurance Education
                 </span>
               </div>
             </div>
 
-            {/* Actions: Like, Watch Later, Share */}
+            {/* Actions: Like, Watch Later, Share (YouTube Pill Buttons) */}
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
                 onClick={handleLike}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
                   isLiked
-                    ? 'bg-red-50 border border-red-200 text-red-600'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                    ? 'bg-red-50 text-red-600 border border-red-200'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                 }`}
               >
                 <FiHeart className={`text-sm ${isLiked ? 'fill-red-600' : ''}`} />
@@ -175,10 +178,10 @@ export default function AcademyWatchPage() {
               <button
                 type="button"
                 onClick={handleSave}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
                   isSaved
-                    ? 'bg-emerald-100/90 border border-emerald-500 text-emerald-800'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:text-emerald-700 hover:border-emerald-500/40 hover:bg-emerald-50'
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                 }`}
               >
                 {isSaved ? (
@@ -197,7 +200,7 @@ export default function AcademyWatchPage() {
               <button
                 type="button"
                 onClick={handleShare}
-                className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 {copied ? (
                   <>
@@ -214,11 +217,14 @@ export default function AcademyWatchPage() {
             </div>
           </div>
 
-          {/* 4. Expandable Description Box with Chapters */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-              <span>Lesson Overview & Notes</span>
-              <span className="text-slate-400 font-medium">Duration: {video.duration || 'Full lesson'}</span>
+          {/* 4. Expandable Description Box (YouTube Rounded Gray Container) */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-slate-100/90 border border-slate-200/80 shadow-2xs space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+              <span>{video.views || '15K views'}</span>
+              <span>•</span>
+              <span>{video.uploadDate || 'Recently published'}</span>
+              <span>•</span>
+              <span className="text-slate-500 font-medium">Duration: {video.duration || 'Full lesson'}</span>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
